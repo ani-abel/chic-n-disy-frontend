@@ -1,6 +1,6 @@
 <div class="h-[30rem] relative">
     <img
-        src="https://www.thelaundress.com/cdn/shop/files/Blog-10_Min_HC_b1ac6b84-53ea-4aa5-a9bc-a53e85f09ff9_540x.jpg?v=1717166033"
+        src="https://images.pexels.com/photos/1895015/pexels-photo-1895015.jpeg?auto=compress&cs=tinysrgb&w=800"
         alt=""
         class="w-full h-full object-cover"
     />

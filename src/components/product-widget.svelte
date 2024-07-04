@@ -1,6 +1,6 @@
 <div class="w-full pt-10 h-fit">
     <img 
-        src="https://www.thelaundress.com/cdn/shop/files/PDP-SignatureWash-Front-32oz_360x.png?v=1710422581" 
+        src="https://images.pexels.com/photos/1557980/pexels-photo-1557980.jpeg?auto=compress&cs=tinysrgb&w=800" 
         alt=""
         class="w-full h-[15rem]"
     />

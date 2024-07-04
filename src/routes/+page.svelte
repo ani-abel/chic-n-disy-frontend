@@ -118,7 +118,7 @@
 			<div class="w-11/12">
 				<div class="w-full h-96 relative">
 					<img
-						src="https://www.thelaundress.com/cdn/shop/files/Blog-Whites_13888529-8dee-4422-9326-9a21b4589794_540x.jpg?v=1717166592"
+						src="https://images.pexels.com/photos/21926651/pexels-photo-21926651/free-photo-of-bottle-of-exclusive-chanel-coco-noir-perfume.jpeg?auto=compress&cs=tinysrgb&w=800"
 						alt=""
 						class="w-full h-full object-cover"
 					/>

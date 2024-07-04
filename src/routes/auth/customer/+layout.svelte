@@ -1,13 +1,15 @@
+<style>
+    .nav-active {
+        text-decoration: underline;
+        color: #B0934A !important;
+        background-color: #CFD8DE !important;
+    }
+</style>
+
 <script lang="ts">
     import { page } from '$app/stores';
-    import { customerSection } from '../../../stores/app.store';
 	import Footer from '../../../components/footer.svelte';
 	import Nav from '../../../components/nav.svelte';
-
-	let pageTitle = '';
-    customerSection.subscribe((data) => {
-        pageTitle = data.title;
-    });
     
 </script>
 
@@ -19,17 +21,20 @@
         </p>
 		<div class="w-full flex flex-col xl:flex-row items-start gap-4 xl:gap-12 px-12">
 			<div class="w-full lg:w-[20%]">
-				<a href="/auth/customer/orders">
+				<a class:nav-active="{String($page.route.id).includes('/auth/customer/orders')}"  
+                    href="/auth/customer/orders">
 					<div class="border-b border-[#CFD8DF] py-4">
 						<p class="uppercase text-xs tracking-wider">Orders</p>
 					</div>
 				</a>
-				<a href="/auth/customer/saved-products">
+				<a class:nav-active="{String($page.route.id).includes('/auth/customer/saved-products')}" 
+                    href="/auth/customer/saved-products">
 					<div class="border-b border-[#CFD8DF] py-4">
 						<p class="uppercase text-xs tracking-wider">Saved Products</p>
 					</div>
 				</a>
-				<a href="/auth/customer/recently-viewed">
+				<a class:nav-active="{String($page.route.id).includes('/auth/customer/recently-viewed')}" 
+                    href="/auth/customer/recently-viewed">
 					<div class="border-b border-[#CFD8DF] py-4">
 						<p class="uppercase text-xs tracking-wider">Recently Viewed</p>
 					</div>

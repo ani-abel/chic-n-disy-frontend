@@ -199,6 +199,10 @@ input:focus {
   cursor: pointer;
 }
 
+.cursor-deactivated {
+  cursor:no-drop;
+}
+
 .sidebar {
   position: fixed;
 }

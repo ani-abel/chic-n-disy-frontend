@@ -44,7 +44,7 @@
                     <button class="bg-black uppercase text-sm py-3 tracking-widest w-full text-white mt-4 mb-3" type="submit">
                         Submit
                     </button>
-                    <p class="mt-0">Don't have an account? <a href="/auth/signup"><span class="blue">Sign up</span></a></p>
+                    <p class="mt-0">Already have an account? <a href="/auth"><span class="blue">Login</span></a></p>
                 </div>
             </form>
         </div>
