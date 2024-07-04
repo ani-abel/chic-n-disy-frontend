@@ -1,1 +1,1 @@
-<h1>Admin Dashboard - Metrics</h1>
+<h1>Admin dashboard: Hello Hello</h1>
