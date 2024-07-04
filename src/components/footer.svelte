@@ -189,9 +189,7 @@
 					class="w-full p-4 text-left cursor-pointer"
 				>
 					<div class="flex items-center justify-between">
-						<span
-							:class="handleRotate()"
-							class="transition-transform duration-500 transform fill-current"
+						<span class="transition-transform duration-500 transform fill-current"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

@@ -222,3 +222,23 @@ input:focus {
 .padding-widget-round {
   padding: 30px 20px !important;
 }
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.blue {
+  color: #B0934A
+}
