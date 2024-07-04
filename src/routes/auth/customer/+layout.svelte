@@ -41,7 +41,9 @@
 				</a>
 			</div>
 			<section class="w-full lg:w-4/5">
-				<slot></slot>
+				<div class="w-full grid md:grid-cols-2 gap-2">
+					<slot></slot>
+				</div>
 			</section>
 		</div>
 	</section>

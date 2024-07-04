@@ -14,7 +14,6 @@ const productName = 'Chanel No. 5';
 </script>
 
 <svelte:head>
-    <!-- Font Awesome Link -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
@@ -196,62 +195,53 @@ const productName = 'Chanel No. 5';
                     </div>
                 </section>
 
-                <!-- <section class="border-x my-6 px-8">
-                    <div class="flex items-center gap-2 text-xs my-2">
-                       <span>5</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                        </svg>
-                        <div class="w-24 bg-[#A5B1AA] rounded-md h-px py-0.5"></div>
-                        <p>90</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs my-2">
-                        <span>4</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                        </svg>
-                        <div class="w-24 bg-[#A5B1AA] rounded h-px py-0.5"></div>
-                        <p>80</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs my-2">
-                    <span>3</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                        </svg>
-                        <div class="w-24 bg-[#A5B1AA] rounded h-px py-0.5"></div>
-                        <p>50</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs my-2">
-                    <span>3</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                        </svg>
-                        <div class="w-24 bg-[#A5B1AA] rounded h-px py-0.5"></div>
-                        <p>50</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs my-2">
-                    <span>3</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                        </svg>
-                        <div class="w-20 bg-[#A5B1AA] rounded h-px py-0.5"></div>
-                        <p>10</p>
-                    </div>
-                </section> -->
-            
                 <section class="h-auto flex items-center my-2 lg:my-0">
-                    <a href="/pages/write-a-comment.html">
-                        <button class="text-xs text-white bg-[#A5B1AA] py-2.5 font-medium px-6 rounded-xl">
-                            Write a Review
-                        </button>
-                    </a>
+                    <button class="text-xs text-white bg-[#A5B1AA] py-2.5 font-medium px-6 rounded-xl">
+                        Write a Review
+                    </button>
                 </section>
+            </div>
+        </section>
+
+         <!-- Display if user is logged in -->
+        <section id="give-review" class="w-full flex justify-center">
+            <div class="p-8 border-y border-bottom-none w-11/12 lg:w-3/5 my-10">
+            <form>
+                <div class="my-6">
+                    <label for="password" class="text-xs uppercase tracking-widest">Give a rating</label>
+                    <div class="flex flex-row items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="my-6">
+                    <label for="email" class="text-xs uppercase tracking-widest">Your Review</label>
+                    <textarea rows="10" class="resize-none border border-black w-full p-1.5 mt-1" name="" id=""></textarea>
+                </div>
+                <div class="my-6 text-center">
+                    <button class="bg-black uppercase text-sm py-3 tracking-widest w-full text-white mt-4 mb-3" type="submit">
+                        Submit
+                    </button>
+                </div>
+            </form>
             </div>
         </section>
 
         <!-- reviews -->
         <section class="w-full flex justify-center">
-
             <div class="w-11/12 lg:w-3/5 my-10">
                 <div class="w-full p-8 border-y flex flex-col lg:justify-between gap-8">
                     <div class="">

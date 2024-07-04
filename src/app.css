@@ -246,3 +246,12 @@ input:focus {
 .blue {
   color: #B0934A
 }
+
+
+.resize-none {
+  resize: none;
+}
+
+.border-bottom-none {
+  border-bottom: none;
+}
