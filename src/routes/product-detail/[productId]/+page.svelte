@@ -11,6 +11,14 @@ const productPictures = [
 let pictureInFocus = productPictures[0];
 const productName = 'Chanel No. 5';
 
+let inFocus = 'image';
+const videoInFocus = '../videos/video.mp4';
+
+const setImageInFocus = (/** @type {string} */ picture) => {
+    inFocus = 'image';
+    pictureInFocus = picture;
+}
+
 </script>
 
 <svelte:head>
@@ -32,17 +40,28 @@ const productName = 'Chanel No. 5';
                         {#each productPictures as picture, index}
                             <button 
                                 class="w-16 h-16 focus:border-4 focus:border-black" 
-                                on:click={() => (pictureInFocus = productPictures[index])}
+                                on:click={() => setImageInFocus(productPictures[index])}
                             >
                                 <img src={picture} 
                                 alt={productName + ' ' + index + 1}
                                 class="w-full h-full object-cover"/>
                             </button>
                         {/each}
+                        <button on:click={() => (inFocus = 'video')} class="w-16 h-16 focus:border-4 focus:border-black">
+                            <video src={videoInFocus} class="w-full h-full object-cover">
+                                <track kind="captions" />
+                            </video>
+                        </button>
                     </div>
+
                     <div class="w-4/5 h-full">
-                        <img src={pictureInFocus} alt={productName} 
-                        class="w-full h-full object-cover"/>
+                        {#if inFocus === 'video'}
+                            <video controls src={videoInFocus} class="w-full h-full object-cover">
+                                <track kind="captions" />
+                            </video>
+                        {:else}
+                            <img src={pictureInFocus} alt={productName} class="w-full h-full object-cover"/>
+                        {/if}
                     </div>
                 </div>
 
@@ -68,11 +87,6 @@ const productName = 'Chanel No. 5';
 
                         <p class="text-sm">&nbsp;4.8&emsp;|&emsp;104 Reviews</p>
                     </div>
-
-                    <!-- <section class="w-full bg-[#BFCBC6] p-3 flex flex-row items-center gap-4">
-                        <input type="radio" checked class="w-4 h-4"/>
-                        <p class="uppercase text-sm">one time delivery ₦&nbsp;26,000</p>
-                    </section> -->
 
                     <section class="w-full my-4 flex items-center gap-2 border-b border-black pt-4 pb-8">
                         <div class="w-fit px-3 py-2 border border-black flex flex-row items-center gap-4">
