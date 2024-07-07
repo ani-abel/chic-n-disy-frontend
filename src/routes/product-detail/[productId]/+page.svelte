@@ -53,7 +53,6 @@ const setImageInFocus = (/** @type {string} */ picture) => {
                             </video>
                         </button>
                     </div>
-
                     <div class="w-4/5 h-full">
                         {#if inFocus === 'video'}
                             <video controls src={videoInFocus} class="w-full h-full object-cover">
