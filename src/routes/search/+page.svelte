@@ -2,7 +2,7 @@
 	import Nav from "../../components/nav.svelte";
     import Footer from "../../components/footer.svelte";
 	import ProductWidget from "../../components/product-widget.svelte";
-
+ 
 </script>
 <section>
     <div class="w-full">
