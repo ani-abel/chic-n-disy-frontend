@@ -1,3 +1,7 @@
+export const BASE_URL = 'http://localhost:8080';
+
+export const NAIRA_SIGN = '₦';
+
 export enum RequestStatus {
 	SUCCESSFUL = 'SUCCESSFUL',
 	FAILED = 'FAILED'

@@ -1,3 +1,7 @@
+<script>
+
+</script>
+
 <section class="w-11/12 pt-50">
     <section class="grid grid-cols-12 gap-4">
         <div class="col-span-12 sm:col-span-2"></div>
@@ -39,15 +43,13 @@
                     <label for="password" class="text-xs uppercase tracking-widest">Product Category</label>
                     <select class="border border-black w-full p-1.5 mt-1">
                         <option>Perfumes</option>
-                        <option>Bed linen</option>
-                        <option>Fragrances</option>
                     </select>
                 </div>
 
                 <div class="border-top-solid mt-10 my-6 pt-10">
                     <!-- Custom File Upload Button -->
                     <label class="relative cursor-pointer bg-black text-white font-medium py-2 px-4 rounded-md shadow hover:bg-black focus:ring focus:ring-blue-300 focus:outline-none">
-                        <span>Upload Product Photo(s)</span>
+                        <span>Upload Photo(s)</span>
                         <input accept="image/*" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     </label>
                     
@@ -58,27 +60,6 @@
                             <div class="bg-white p-4 shadow rounded-lg">
                               <img src="https://via.placeholder.com/150" alt="Photo 1" class="w-full h-auto rounded-md" />
                             </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 2" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 3" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 4" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 5" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 6" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 7" class="w-full h-auto rounded-md" />
-                            </div>
-                            <div class="bg-white p-4 shadow rounded-lg">
-                              <img src="https://via.placeholder.com/150" alt="Photo 8" class="w-full h-auto rounded-md" />
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -87,7 +68,7 @@
                 <div class="border-top-solid mt-10 my-6 pt-10">
                     <!-- Custom File Upload Button -->
                     <label class="relative cursor-pointer bg-black text-white font-medium py-2 px-4 rounded-md shadow hover:bg-black focus:ring focus:ring-blue-300 focus:outline-none">
-                        <span>Upload Product Video</span>
+                        <span>Upload Video</span>
                         <input accept="video/*" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     </label>
                     

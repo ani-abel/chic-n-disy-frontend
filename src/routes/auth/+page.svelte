@@ -1,13 +1,14 @@
 <script>
-    import { AxiosError } from 'axios';
+	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
 	import { apiLogin } from '../../api-requests/request';
-	import { displayError } from '../../utils/util.function';
+	import { displayMessage, saveToLocalStorage } from '../../utils';
 
 	const formData = {
 		email: null,
 		password: null
 	};
+	
 	const login = async (/** @type {Event} */ event) => {
 		try {
 			event.preventDefault();
@@ -16,7 +17,7 @@
 				const {
 					data: { userId, token, role, email }
 				} = response;
-				localStorage.setItem('ecommerce-user', JSON.stringify({ role, userId, email, token }));
+				saveToLocalStorage('ecommerce-user', JSON.stringify({ role, userId, email, token }));
 				if (role === 'ADMIN') {
 					goto('/auth/admin');
 				} else {
@@ -26,7 +27,7 @@
 		} catch (ex) {
 			if (ex instanceof AxiosError) {
 				const axiosErrorObject = ex.response?.data;
-				displayError({
+				displayMessage({
 					message: axiosErrorObject?.message,
 					header: 'Error',
 					type: 'danger'
