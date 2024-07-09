@@ -1,10 +1,7 @@
 <script>
+	import { AxiosError } from 'axios';
 	import { createProduct, uploadFiles } from '../../../../../api-requests/request';
-	import {
-		convertFilesToBase64Strings,
-		displayMessage,
-		getItemFromLocalStorage
-	} from '../../../../../utils';
+	import { convertFilesToBase64Strings, displayMessage, getJwtToken } from '../../../../../utils';
 
 	export let data;
 
@@ -31,20 +28,31 @@
 				message: 'Images must be selected'
 			});
 		} else {
-			const userObject = getItemFromLocalStorage('ecommerce-user', true);
-			const token = userObject?.token;
-			(async () => {
-				const newProduct = await createProduct(formData, { Authorization: `Bearer ${token}` });
-				if (newProduct?.success) {
-					const message = newProduct.message ?? 'Product created successfully';
+			const token = getJwtToken();
+			try {
+				(async () => {
+					const newProduct = await createProduct(formData, { Authorization: `Bearer ${token}` });
+					if (newProduct?.success) {
+						const message = newProduct.message ?? 'Product created successfully';
+						displayMessage({
+							message,
+							type: 'success',
+							header: message
+						});
+						resetForm();
+					}
+				})();
+			} catch (ex) {
+				if (ex instanceof AxiosError) {
+					const axiosErrorObject = ex.response?.data;
 					displayMessage({
-						message,
-						type: 'success',
-						header: message
+						message: axiosErrorObject?.message,
+						header: 'Error',
+						type: 'danger'
 					});
-					resetForm();
 				}
-			})();
+				throw ex;
+			}
 		}
 	};
 

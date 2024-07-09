@@ -8,7 +8,7 @@
 		formatDate,
 		NAIRA_SIGN,
 		displayMessage,
-		getItemFromLocalStorage
+		getJwtToken
 	} from '../../../../utils/index';
 
 	export let data;
@@ -73,12 +73,12 @@
 	};
 
 	const deleteProduct = (/** @type {string} */ productId) => {
-		const userObject = getItemFromLocalStorage('ecommerce-user', true);
+		const token = getJwtToken();
 		try {
 			(async () => {
 				const deleteResult = await updateProduct(
 					{ productId, status: false },
-					{ Authorization: `Bearer ${userObject.token}` }
+					{ Authorization: `Bearer ${token}` }
 				);
 				if (deleteResult?.success) {
 					const message = 'Deleted successfully';

@@ -29,6 +29,11 @@ export const getItemFromLocalStorage = (key: string, parseJson = true) => {
 	return data;
 };
 
+export const getJwtToken = (): string => {
+	const userObject = getItemFromLocalStorage('ecommerce-user', true);
+	return userObject?.token;
+};
+
 export const displayMessage = (error: NotificationMetaType): void => {
 	switch (error.type) {
 		default:
