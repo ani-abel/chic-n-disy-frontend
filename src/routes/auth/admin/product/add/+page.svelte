@@ -159,8 +159,9 @@
 				</div>
 
 				<div class="my-6">
-					<label for="password" class="text-xs uppercase tracking-widest">Product Category</label>
+					<label for="category" class="text-xs uppercase tracking-widest">Product Category</label>
 					<select
+						name="category"
 						required
 						bind:value={formData.productCategoryId}
 						class="border border-black w-full p-1.5 mt-1"

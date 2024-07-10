@@ -49,6 +49,11 @@ export const getProductCategories = async (filter: any) => {
 	return httpGet<any>(url);
 };
 
+export const findProductCategoryById = async (productCategoryId: string) => {
+	const url = `${BASE_URL}/product-category/${productCategoryId}`;
+	return httpGet<any>(url);
+};
+
 export const createProduct = async (payload: any, headers: any) => {
 	const url = `${BASE_URL}/product`;
 	return httpPost<any, any>(url, payload, headers);
@@ -71,4 +76,9 @@ export const uploadFiles = async (files: FileList) => {
 		payload.append('files[]', file);
 	}
 	return httpPost<any, any>(url, payload);
+};
+
+export const findProductById = async (productId: string) => {
+	const url = `${BASE_URL}/product/${productId}`;
+	return httpGet<any>(url);
 };
