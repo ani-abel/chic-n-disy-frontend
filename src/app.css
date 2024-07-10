@@ -195,12 +195,14 @@ input:focus {
   overflow-y: scroll;
 }
 
-.cursor-pointer {
+.cursor-pointer,
+input[type="submit"],
+button[type="submit"] {
   cursor: pointer;
 }
 
 .cursor-deactivated {
-  cursor:no-drop;
+  cursor: no-drop;
 }
 
 .sidebar {

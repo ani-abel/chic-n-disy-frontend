@@ -59,6 +59,11 @@ export const createProduct = async (payload: any, headers: any) => {
 	return httpPost<any, any>(url, payload, headers);
 };
 
+export const createProductCategory = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/product-category`;
+	return httpPost<any, any>(url, payload, headers);
+};
+
 export const deleteProduct = async (id: string) => {
 	const url = `${BASE_URL}/product/${id}`;
 	return httpDelete<any>(url);
@@ -66,6 +71,11 @@ export const deleteProduct = async (id: string) => {
 
 export const updateProduct = async (payload: any, headers: any) => {
 	const url = `${BASE_URL}/product`;
+	return httpPatch<any, any>(url, payload, headers);
+};
+
+export const updateProductCategory = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/product-category`;
 	return httpPatch<any, any>(url, payload, headers);
 };
 
