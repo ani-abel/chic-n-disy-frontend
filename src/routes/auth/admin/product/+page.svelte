@@ -133,6 +133,7 @@
 						name="in-stock"
 						class="border border-black w-full p-1.5 mt-1"
 					>
+						<option value={null}>Filter by Product Stock</option>
 						<option value="false">In Stock</option>
 						<option value="true">Out of Stock</option>
 					</select>
@@ -145,6 +146,7 @@
 						name="in-stock"
 						class="border border-black w-full p-1.5 mt-1"
 					>
+						<option value={null}>Filter by Category</option>
 						{#each data.categories.data as category}
 							<option value={category.id}>{category.name}</option>
 						{/each}

@@ -9,6 +9,38 @@ export const apiLogin = async (email: string, password: string) => {
 	return httpPost<any, any>(url, body);
 };
 
+export const getUsers = async (filter: any) => {
+	let url = `${BASE_URL}/user?status=true`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
+	if (filter?.searchTerm) {
+		url += `&searchTerm=${filter?.searchTerm}`;
+	}
+	if (filter?.role) {
+		url += `&role=${filter?.role}`;
+	}
+	return httpGet<any>(url);
+};
+
+export const findUserById = async (userId: string) => {
+	const url = `${BASE_URL}/user/${userId}`;
+	return httpGet<any>(url);
+};
+
+export const updateUser = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/user`;
+	return httpPatch<any, any>(url, payload, headers);
+};
+
+export const createUserSignup = async (payload: any) => {
+	const url = `${BASE_URL}/user/sign-up`;
+	return httpPost<any, any>(url, payload);
+};
+
 export const getProducts = async (filter: any) => {
 	let url = `${BASE_URL}/product?status=true`;
 	if (filter?.pageNumber) {
