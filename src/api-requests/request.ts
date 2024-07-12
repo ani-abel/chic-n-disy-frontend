@@ -124,3 +124,21 @@ export const findProductById = async (productId: string) => {
 	const url = `${BASE_URL}/product/${productId}`;
 	return httpGet<any>(url);
 };
+
+export const findProductCategoryGrouping = async (
+	productsPerCategory = 10,
+	categoriesPerPage = 3
+) => {
+	const url = `${BASE_URL}/product/category-grouping/products?productsPerCategory=${productsPerCategory}&categoriesPerPage=${categoriesPerPage}`;
+	return httpGet<any>(url);
+};
+
+export const globalSearchForProducts = async (searchTerm: string) => {
+	const url = `${BASE_URL}/product/search/products?searchTerm=${searchTerm}`;
+	return httpGet<any>(url);
+};
+
+export const findTopSellingProducts = async (limit = 3) => {
+	const url = `${BASE_URL}/product/top-selling/products/${limit}`;
+	return httpGet<any>(url);
+};

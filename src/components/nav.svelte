@@ -63,8 +63,8 @@
                 </div>
             </a>
             <div class="text-sm hidden lg:flex flex-row items-center gap-8 pt-4">
-                <a href="/pages/ingredients-list.html">
-                    <p>Shop for Fabrics</p>
+                <a href="/">
+                    <p>Home</p>
                 </a>
                 <a href="/about">
                     <p>About Us</p>
@@ -98,9 +98,9 @@
                     <p>Shop All</p>
                 </div>
             </a>
-            <a href="/pages/ingredients-list.html">
+            <a href="/">
                 <div class="pb-4 border-b pl-8 py-4">
-                    <p>Shop for Fabrics</p>
+                    <p>Home</p>
                 </div>
             </a>
             <a href="/about">

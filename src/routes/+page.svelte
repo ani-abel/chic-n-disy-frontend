@@ -4,6 +4,7 @@
 	import Footer from '../components/footer.svelte';
 	import Nav from '../components/nav.svelte';
 	
+	export let data;
 </script>
 
 <section>
@@ -34,64 +35,54 @@
 			</a>
 		</div>
 
-        <!-- First category -->
-		<section class="padding-widget-round">
-			<p class="text-3xl text-center playfair">Fragrances</p>
-			<div class="w-full flex justify-center py-4">
-				<a href="/product/fragrances">
-					<button
-						class="text-xs uppercase text-black border border-black px-6 py-2.5 poppins-regular"
-						>View All</button
-					>
-				</a>
-			</div>
-			<div class="w-full flex justify-center mt-8">
-				<div
-					class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
-				>
-				<ProductWidget />
+		{#each data.groupings as group, index}
+			{#if index % 2 === 0}
+				<!-- First category -->
+				<section class="padding-widget-round">
+					<p class="text-3xl text-center playfair">{group.category.name}</p>
+					<div class="w-full flex justify-center py-4">
+						<a href="/product/{group.category.id}">
+							<button
+								class="text-xs uppercase text-black border border-black px-6 py-2.5 poppins-regular"
+								>View All</button
+							>
+						</a>
+					</div>
+					<div class="w-full flex justify-center mt-8">
+						<div
+							class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
+						>
+						{#each group.products as product}
+							<ProductWidget product={product} />
+						{/each}
+					</div>
+				</section>
+			{/if}
 
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-
-				<ProductWidget />
-			</div>
-		</section>
-
-        <!-- Second category -->
-        <section class="padding-widget-round bg-[#F2F0EA]">
-			<p class="text-3xl text-center playfair">Fragrances</p>
-			<div class="w-full flex justify-center py-4">
-				<a href="/product/fragrances">
-					<button
-						class="text-xs uppercase text-black border border-black px-6 py-2.5 poppins-regular"
-						>View All</button
-					>
-				</a>
-			</div>
-			<div class="w-full flex justify-center mt-8">
-				<div
-					class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
-				>
-					<ProductWidget />
-					<ProductWidget />
-					<ProductWidget />
-					<ProductWidget />
-					<ProductWidget />
-				</div>
-			</div>
-		</section>
+			{#if index % 2 !== 0}
+				<!-- Second category -->
+				<section class="padding-widget-round bg-[#F2F0EA]">
+					<p class="text-3xl text-center playfair">{group.category.name}</p>
+					<div class="w-full flex justify-center py-4">
+						<a href="/product/{group.category.id}">
+							<button
+								class="text-xs uppercase text-black border border-black px-6 py-2.5 poppins-regular"
+								>View All</button
+							>
+						</a>
+					</div>
+					<div class="w-full flex justify-center mt-8">
+						<div
+							class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
+						>
+						{#each group.products as product}
+							<ProductWidget product={product} />
+						{/each}
+						</div>
+					</div>
+				</section>
+			{/if}
+		{/each}
 
 		<section class="w-full flex justify-center items-center">
 			<div class="w-11/12 md:w-3/5 lg:w-1/2 my-14 p-4 great-vibes-regular">
@@ -107,9 +98,9 @@
 				<p class="text-center text-3xl py-8 playfair">Top Sellers</p>
 
 				<div class="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-					<TopProductWidget />
-					<TopProductWidget />
-					<TopProductWidget />
+					{#each data.topProducts.data as product}
+						<TopProductWidget product={product} />
+					{/each}
 				</div>
 			</div>
 		</section>
