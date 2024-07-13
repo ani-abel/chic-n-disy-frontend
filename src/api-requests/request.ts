@@ -142,3 +142,11 @@ export const findTopSellingProducts = async (limit = 3) => {
 	const url = `${BASE_URL}/product/top-selling/products/${limit}`;
 	return httpGet<any>(url);
 };
+
+export const findProductFullDetail = async (productId: string, userId?: string) => {
+	let url = `${BASE_URL}/product/find-product/full-data/${productId}`;
+	if (userId) {
+		url += `?userId=${userId}`;
+	}
+	return httpGet<any>(url);
+};
