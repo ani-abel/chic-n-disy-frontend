@@ -1,9 +1,20 @@
 <script>
 	import { onMount } from 'svelte';
+	import { AxiosError } from 'axios';
 	import Nav from '../../../components/nav.svelte';
 	import Footer from '../../../components/footer.svelte';
-	import { findProductFullDetail } from '../../../api-requests/request';
-	import { AppRole, formatDate, getItemFromLocalStorage } from '../../../utils';
+	import {
+		findProductFullDetail,
+		makeProductReview,
+		saveRecentlyViewedProduct
+	} from '../../../api-requests/request';
+	import {
+		AppRole,
+		displayMessage,
+		formatDate,
+		getItemFromLocalStorage,
+		getJwtToken
+	} from '../../../utils';
 
 	export /** @type {any} */ let data;
 	let /** @type {any} */ user;
@@ -16,36 +27,63 @@
 	onMount(async () => {
 		user = getItemFromLocalStorage('ecommerce-user', true);
 		if (user?.userId && user?.role === AppRole.CUSTOMER) {
+			// If user is logged-in
 			data = await findProductFullDetail(data.product.id, user.userId);
+			await saveRecentlyViewedProduct(
+				{ userId: user.userId, productId: data.product.id },
+				{ Authorization: `Bearer ${user.token}` }
+			);
 		}
 	});
 
 	const onSubmit = (/** @type {Event} */ e) => {
 		e.preventDefault();
+		if (formData.rating === 0) {
+			const message = 'Select a rating';
+			displayMessage({
+				message,
+				header: message,
+				type: 'danger'
+			});
+			return;
+		}
+		(async () => {
+			try {
+				const token = getJwtToken();
+				const result = await makeProductReview(
+					{ ...formData, productId: data.product.id },
+					{ Authorization: `Bearer ${token}` }
+				);
+				if (result?.success) {
+					data.reviews = [result.data, ...data.reviews];
+					const message = result.message ?? 'Submitted successfully';
+					displayMessage({
+						message,
+						header: message,
+						type: 'success'
+					});
+					resetForm();
+				}
+			} catch (ex) {
+				if (ex instanceof AxiosError) {
+					const axiosErrorObject = ex.response?.data;
+					displayMessage({
+						message: axiosErrorObject?.message,
+						header: 'Error',
+						type: 'danger'
+					});
+				}
+				throw ex;
+			}
+		})();
 	};
 
-	// Remove later
-	data.userHasBoughtProduct = true;
-	data.reviews = [
-		{
-			title: 'Loved it',
-			comment: 'I liked this product',
-			rating: 2.8,
-			user: {
-				email: 'ghgh@gmail.com'
-			},
-			dateCreated: new Date()
-		},
-		{
-			title: 'Loved it',
-			comment: 'I liked this product',
-			rating: 2.8,
-			user: {
-				email: 'ghgh@gmail.com'
-			},
-			dateCreated: new Date()
-		}
-	];
+	const resetForm = () => {
+		formData.comment = null;
+		formData.rating = 0;
+		formData.title = null;
+	};
+
 	const productPictures = (data.product.imagesForThisProduct ?? []).map(
 		(/** @type {any} */ { url }) => url
 	);
@@ -68,12 +106,6 @@
 		rel="stylesheet"
 		href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
 	/>
-	<!-- <link
-		rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-		integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
-		crossorigin="anonymous"
-	/> -->
 </svelte:head>
 
 <section>
@@ -132,6 +164,13 @@
 						<p class="text-sm">
 							&nbsp;{data.product.rating}&emsp;|&emsp;{data.noOfReviews ?? 0} Reviews
 						</p>
+						{#if data.product.quantity <= 10}
+							<p class="text-sm text-red">
+								&nbsp;| {data.product.quantity ?? 0} units left
+							</p>
+						{:else}
+							<p class="text-sm text-green">&nbsp;| Well Stocked</p>
+						{/if}
 					</div>
 
 					<section class="w-full my-4 flex items-center gap-2 border-b border-black pt-4 pb-8">
@@ -232,11 +271,13 @@
 					</div>
 				</section>
 
-				<section class="h-auto flex items-center my-2 lg:my-0">
-					<button class="text-xs text-white bg-[#A5B1AA] py-2.5 font-medium px-6 rounded-xl">
-						Write a Review
-					</button>
-				</section>
+				{#if user && data.userHasBoughtProduct && !data.userHasReviewedProduct}
+					<section class="h-auto flex items-center my-2 lg:my-0">
+						<button class="text-xs text-white bg-[#A5B1AA] py-2.5 font-medium px-6 rounded-xl">
+							Write a Review
+						</button>
+					</section>
+				{/if}
 			</div>
 		</section>
 
@@ -254,7 +295,7 @@
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 										<i
-                                            on:mouseover={() => (formData.rating = i + 1)}
+											on:mouseover={() => (formData.rating = i + 1)}
 											on:click={() => (formData.rating = i + 1)}
 											class="cursor-pointer bi bi-star-fill star"
 										></i>
@@ -263,7 +304,7 @@
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 										<i
-                                            on:mouseover={() => (formData.rating = i + 1)}
+											on:mouseover={() => (formData.rating = i + 1)}
 											on:click={() => (formData.rating = i + 1)}
 											class="cursor-pointer bi bi-star-half star"
 										></i>
@@ -272,7 +313,7 @@
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 										<i
-                                            on:mouseover={() => (formData.rating = i + 1)}
+											on:mouseover={() => (formData.rating = i + 1)}
 											on:click={() => (formData.rating = i + 1)}
 											class="cursor-pointer bi bi-star star"
 										></i>
@@ -281,19 +322,23 @@
 							</div>
 						</div>
 						<div class="my-6">
-							<label for="email" class="text-xs uppercase tracking-widest">Title</label>
-							<input bind:value={formData.title} class="border border-black w-full p-1.5 mt-1" />
+							<label for="title" class="text-xs uppercase tracking-widest">Title</label>
+							<input
+								name="title"
+								bind:value={formData.title}
+								required
+								class="border border-black w-full p-1.5 mt-1"
+							/>
 						</div>
 						<div class="my-6">
-							<label for="email" class="text-xs uppercase tracking-widest"
+							<label for="comment" class="text-xs uppercase tracking-widest"
 								>Your Comment (Optional)</label
 							>
 							<textarea
 								bind:value={formData.comment}
 								rows="10"
 								class="resize-none border border-black w-full p-1.5 mt-1"
-								name=""
-								id=""
+								name="comment"
 							></textarea>
 						</div>
 						<div class="my-6 text-center">
@@ -315,7 +360,12 @@
 				{#each data.reviews as review}
 					<div class="w-full p-8 border-y flex flex-col lg:justify-between gap-8">
 						<div class="">
-							<p class="text-xs font-medium playfair">{review.user.email}</p>
+							<p class="text-xs font-medium playfair">
+								{review.user.firstName}
+								{#if review.user.lastName}
+									<span>{review.user.lastName}</span>
+								{/if}
+							</p>
 							<div class="text-xs text-[#A5B1AA] flex items-center gap-1">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"

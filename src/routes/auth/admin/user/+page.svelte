@@ -150,6 +150,7 @@
 					<thead>
 						<tr id="thead">
 							<th>#</th>
+							<th>Name</th>
 							<th>Email</th>
 							<th>Phone Number</th>
 							<th>Role</th>
@@ -162,6 +163,7 @@
 						{#each users as user, index}
 							<tr id="tr">
 								<td>{index + 1}</td>
+								<td>{user.firstName} {user.lastName}</td>
 								<td>{user.email}</td>
 								<td>{user.phoneNumber}</td>
 								<td>{user.role}</td>

@@ -2,7 +2,7 @@
 	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
 	import { apiLogin } from '../../api-requests/request';
-	import { displayMessage, saveToLocalStorage } from '../../utils';
+	import { AppRole, displayMessage, saveToLocalStorage } from '../../utils';
 
 	const formData = {
 		email: null,
@@ -18,10 +18,10 @@
 					data: { userId, token, role, email }
 				} = response;
 				saveToLocalStorage('ecommerce-user', JSON.stringify({ role, userId, email, token }));
-				if (role === 'ADMIN') {
+				if (role === AppRole.ADMIN) {
 					goto('/auth/admin');
 				} else {
-					goto('/auth/customer');
+					goto('/auth/customer/orders');
 				}
 			}
 		} catch (ex) {

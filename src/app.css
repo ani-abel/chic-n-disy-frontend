@@ -261,3 +261,11 @@ button[type="submit"] {
 .pb-20 {
   padding-bottom: 20px;
 }
+
+.text-red {
+  color: rgb(158, 25, 25);
+}
+
+.text-green {
+  color: rgb(17, 102, 17);
+}

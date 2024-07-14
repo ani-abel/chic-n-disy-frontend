@@ -150,3 +150,51 @@ export const findProductFullDetail = async (productId: string, userId?: string) 
 	}
 	return httpGet<any>(url);
 };
+
+export const makeProductReview = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/product-review`;
+	return httpPost<any, any>(url, payload, headers);
+};
+
+export const saveRecentlyViewedProduct = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/recently-viewed-product`;
+	return httpPost<any, any>(url, payload, headers);
+};
+
+export const findRecentlyViewedProducts = async (filter: any, headers: any) => {
+	let url = `${BASE_URL}/recently-viewed-product?status=true`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
+	if (filter?.searchTerm) {
+		url += `&searchTerm=${filter?.searchTerm}`;
+	}
+	return httpGet<any>(url, headers);
+};
+
+export const saveProduct = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/saved-product`;
+	return httpPost<any, any>(url, payload, headers);
+};
+
+export const findSavedProducts = async (filter: any, headers: any) => {
+	let url = `${BASE_URL}/saved-product?status=true`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
+	if (filter?.searchTerm) {
+		url += `&searchTerm=${filter?.searchTerm}`;
+	}
+	return httpGet<any>(url, headers);
+};
+
+export const removeSavedProduct = async (productId: string, headers: any) => {
+	const url = `${BASE_URL}/saved-product/${productId}`;
+	return httpDelete<any>(url, headers);
+};
