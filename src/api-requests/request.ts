@@ -2,10 +2,7 @@ import { BASE_URL, httpPost, httpGet, httpDelete, httpPatch } from '../utils';
 
 export const apiLogin = async (email: string, password: string) => {
 	const url = `${BASE_URL}/auth/login`;
-	const body = {
-		email,
-		password
-	};
+	const body = { email, password };
 	return httpPost<any, any>(url, body);
 };
 
@@ -191,10 +188,57 @@ export const findSavedProducts = async (filter: any, headers: any) => {
 	if (filter?.searchTerm) {
 		url += `&searchTerm=${filter?.searchTerm}`;
 	}
-	return httpGet<any>(url, headers);
+	return await httpGet<any>(url, headers);
 };
 
 export const removeSavedProduct = async (productId: string, headers: any) => {
 	const url = `${BASE_URL}/saved-product/${productId}`;
-	return httpDelete<any>(url, headers);
+	return await httpDelete<any>(url, headers);
+};
+
+export const joinNewsletter = async (payload: any) => {
+	const url = `${BASE_URL}/newsletter`;
+	return await httpPost<any, any>(url, payload);
+};
+
+export const findUserOrderHistory = async (filter: any, headers: any) => {
+	let url = `${BASE_URL}/order/user/order-history`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
+	return await httpGet<any>(url, headers);
+};
+
+export const findOrders = async (filter: any, headers: any) => {
+	let url = `${BASE_URL}/order?status=true`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
+	if (filter?.searchTerm) {
+		url += `&searchTerm=${filter?.searchTerm}`;
+	}
+	if (filter?.userId) {
+		url += `&userId=${filter?.userId}`;
+	}
+	if (filter?.paymentProvider) {
+		url += `&paymentProvider=${filter?.paymentProvider}`;
+	}
+	if (filter?.paymentStatus) {
+		url += `&paymentStatus=${filter?.paymentStatus}`;
+	}
+	if (filter?.orderStatus) {
+		url += `&orderStatus=${filter?.orderStatus}`;
+	}
+	return await httpGet<any>(url, headers);
+};
+
+export const findOrderById = async (orderId: string, headers: any) => {
+	const url = `${BASE_URL}/order/${orderId}`;
+	return await httpGet<any>(url, headers);
 };

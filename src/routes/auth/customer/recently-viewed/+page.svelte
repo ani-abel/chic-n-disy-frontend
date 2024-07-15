@@ -3,18 +3,18 @@
 	import { getJwtToken } from '../../../../utils';
 	import { findRecentlyViewedProducts } from '../../../../api-requests/request';
 
-	let /** @type {any[]} */ result = [];
+	let /** @type {any[]} */ recentlyViewedProducts = [];
 
 	onMount(async () => {
 		const token = getJwtToken();
 		const headers = { Authorization: `Bearer ${token}` };
 		const response = await findRecentlyViewedProducts({}, headers);
-		result = response.data;
+		recentlyViewedProducts = response.data;
 	});
 </script>
 
-{#if result.length > 0}
-	{#each result as product}
+{#if recentlyViewedProducts.length > 0}
+	{#each recentlyViewedProducts as product}
 		<div class="w-full border border-gray-[#666666] mb-2">
 			<div class="w-full flex-col">
 				<div class="w-full lg:w-11/12">

@@ -1,12 +1,51 @@
 <script>
-	    import { slide } from 'svelte/transition';
+	import { AxiosError } from 'axios';
+	import { slide } from 'svelte/transition';
+	import { joinNewsletter } from '../api-requests/request';
+	import { displayMessage, getItemFromLocalStorage } from '../utils';
 
-    const year = new Date().getFullYear();
+	const year = new Date().getFullYear();
 
+	const formData = {
+		email: null
+	};
 	const footerToggle = {
 		whoAreWe: false,
 		customerCare: false,
 		more: false
+	};
+
+	const onSubmit = (/** @type {Event} */ e) => {
+		e.preventDefault();
+		const /** @type {any} */ payload = { email: formData.email };
+		const user = getItemFromLocalStorage('ecommerce-user', true);
+		if (user?.userId) {
+			payload.userId = user.userId;
+		}
+		(async () => {
+			try {
+				const result = await joinNewsletter(payload);
+				if (result?.success) {
+					const message = result.message ?? 'Joined successfully';
+					displayMessage({
+						message,
+						header: message,
+						type: 'success'
+					});
+					// Reset form
+					formData.email = null;
+				}
+			} catch (ex) {
+				if (ex instanceof AxiosError) {
+					const message = ex.response?.data.message ?? 'Something went wrong';
+					displayMessage({
+						message,
+						header: 'Error',
+						type: 'danger'
+					});
+				}
+			}
+		})();
 	};
 
 	const handleClick = (/** @type {string} */ section) => {
@@ -62,12 +101,32 @@
 
 			<div>
 				<p class="py-4 text-xs uppercase tracking-wider">Be the first to know !</p>
-				<form>
+				<form
+					on:submit={onSubmit}
+					class="flex flex-row items-center gap-4 border-b border-[#000] bg-[#CFD8DF]"
+				>
 					<input
+						bind:value={formData.email}
 						type="email"
-						class="w-full border-b-2 border-[#000] bg-[#CFD8DF] text-black focus:outline-none text-xs pt-4 pb-2 placeholder:text-black"
+						name="email"
+						class="w-11/12 bg-[#CFD8DF] text-black focus:outline-none text-xs pt-4 pb-2 placeholder:text-black"
 						placeholder="Enter your email"
 					/>
+
+					<button type="submit">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							fill="currentColor"
+							class="bi bi-envelope"
+							viewBox="0 0 16 16"
+						>
+							<path
+								d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"
+							/>
+						</svg>
+					</button>
 				</form>
 
 				<div class="w-full flex items-center gap-4 my-4">
@@ -165,7 +224,11 @@
 					</div>
 				</div>
 				{#if footerToggle.whoAreWe}
-					<div class="relative transition-all duration-700" in:slide={{ duration: 600, delay: 300 }} out:slide={{ duration: 600, delay: 300 }}>
+					<div
+						class="relative transition-all duration-700"
+						in:slide={{ duration: 600, delay: 300 }}
+						out:slide={{ duration: 600, delay: 300 }}
+					>
 						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
 							<a href="#">
 								<p class="py-1 text-center">About us</p>
@@ -189,8 +252,7 @@
 					class="w-full p-4 text-left cursor-pointer"
 				>
 					<div class="flex items-center justify-between">
-						<span class="transition-transform duration-500 transform fill-current"
-						>
+						<span class="transition-transform duration-500 transform fill-current">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -210,7 +272,11 @@
 					</div>
 				</div>
 				{#if footerToggle.customerCare}
-					<div class="relative transition-all duration-700" in:slide={{ duration: 600, delay: 300 }} out:slide={{ duration: 600, delay: 300 }}>
+					<div
+						class="relative transition-all duration-700"
+						in:slide={{ duration: 600, delay: 300 }}
+						out:slide={{ duration: 600, delay: 300 }}
+					>
 						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
 							<a href="#">
 								<p class="py-1 text-center">My Account</p>
@@ -255,7 +321,11 @@
 					</div>
 				</div>
 				{#if footerToggle.more}
-					<div class="relative transition-all duration-700" in:slide={{ duration: 600, delay: 300 }} out:slide={{ duration: 600, delay: 300 }}>
+					<div
+						class="relative transition-all duration-700"
+						in:slide={{ duration: 600, delay: 300 }}
+						out:slide={{ duration: 600, delay: 300 }}
+					>
 						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
 							<a href="#">
 								<p class="py-1 text-center">My Account</p>
@@ -267,10 +337,8 @@
 				{/if}
 			</div>
 			<!-- End 3 -->
-
 			<p class="text-black text-[10px] text-center font-medium">{year} @ Laundress</p>
 		</div>
 	</div>
-
 	<div class="w[20%] hidden lg:inline-block"></div>
 </footer>

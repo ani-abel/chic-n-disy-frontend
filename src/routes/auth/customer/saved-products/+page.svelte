@@ -65,7 +65,7 @@
 							{:else}
 								<p class="text-red text-xs py-1 text-slate-500">Status:&nbsp;Out of Stock</p>
 							{/if}
-							<p class="font-semibold text-xs pt-2">Saved On: 03-04</p>
+							<p class="font-semibold text-xs pt-2">Code: {product.code}</p>
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-static-element-interactions -->
 							<div
