@@ -39,7 +39,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@solana/qr-code-styling": "^1.6.0",
     "@zerodevx/svelte-toast": "^0.9.5",
-    "axios": "^1.7.2"
+    "axios": "^1.7.2",
+    "i": "^0.3.7",
+    "jsbarcode": "^3.11.6",
+    "npm": "^10.8.2"
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import '../app.css';
 
 	const options = {};
@@ -12,7 +12,5 @@
 </svelte:head>
 
 <SvelteToast {options} />
-
-<!-- <button on:click={() => toast.push('Hello world!')}>SHOW TOAST</button> -->
 
 <slot />

@@ -3,7 +3,7 @@
 	import TopProductWidget from '../components/top-product-widget.svelte';
 	import Footer from '../components/footer.svelte';
 	import Nav from '../components/nav.svelte';
-	
+
 	export let data;
 </script>
 
@@ -59,9 +59,10 @@
 						<div
 							class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
 						>
-						{#each group.products as product}
-							<ProductWidget product={product} />
-						{/each}
+							{#each group.products as product}
+								<ProductWidget {product} />
+							{/each}
+						</div>
 					</div>
 				</section>
 			{/if}
@@ -82,9 +83,9 @@
 						<div
 							class="w-11/12 grid gap-4 overflow-x-auto grid-flow-col auto-cols-[20rem] lg:overflow-x-hidden md:grid-flow-row md:grid-cols-3 lg:grid-cols-5"
 						>
-						{#each group.products as product}
-							<ProductWidget product={product} />
-						{/each}
+							{#each group.products as product}
+								<ProductWidget {product} />
+							{/each}
 						</div>
 					</div>
 				</section>
@@ -106,7 +107,7 @@
 
 				<div class="w-full grid md:grid-cols-2 lg:grid-cols-3 gap-4">
 					{#each data.topProducts.data as product}
-						<TopProductWidget product={product} />
+						<TopProductWidget {product} />
 					{/each}
 				</div>
 			</div>

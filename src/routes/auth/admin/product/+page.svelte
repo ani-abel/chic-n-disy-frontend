@@ -110,6 +110,13 @@
 	};
 </script>
 
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+	/>
+</svelte:head>
+
 <section class="flex-1 pt-50">
 	<div class="w-full flex justify-center">
 		<section class="w-11/12">
@@ -227,6 +234,54 @@
 												/>
 											</svg>
 										</span>
+										<a href="/auth/admin/product/barcode/{product.id}">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												fill="currentColor"
+												class="bi bi-barcode"
+												viewBox="0 0 16 16"
+											>
+												<path
+													d="M0 0h1v16H0V0zm2 0h1v16H2V0zm2 0h2v16H4V0zm3 0h1v16H7V0zm2 0h2v16H9V0zm3 0h1v16h-1V0zm2 0h1v16h-1V0z"
+												/>
+											</svg></a
+										>
+										<a href="/auth/admin/product/qr-code/{product.id}">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="16"
+												height="16"
+												fill="currentColor"
+												class="bi bi-qrcode"
+												viewBox="0 0 16 16"
+											>
+												<!-- First row -->
+												<rect x="0" y="0" width="4" height="4" />
+												<rect x="6" y="0" width="2" height="2" />
+												<rect x="10" y="0" width="6" height="2" />
+												<rect x="14" y="2" width="2" height="2" />
+
+												<!-- Second row -->
+												<rect x="0" y="6" width="4" height="4" />
+												<rect x="6" y="6" width="2" height="2" />
+												<rect x="8" y="6" width="2" height="2" />
+												<rect x="10" y="8" width="2" height="2" />
+												<rect x="14" y="6" width="2" height="2" />
+
+												<!-- Third row -->
+												<rect x="0" y="10" width="2" height="2" />
+												<rect x="2" y="12" width="2" height="2" />
+												<rect x="6" y="12" width="2" height="2" />
+												<rect x="10" y="12" width="4" height="4" />
+												<rect x="12" y="10" width="2" height="2" />
+
+												<!-- Fourth row -->
+												<rect x="0" y="14" width="4" height="2" />
+												<rect x="6" y="14" width="2" height="2" />
+											</svg>
+										</a>
 									</div>
 								</td>
 							</tr>
