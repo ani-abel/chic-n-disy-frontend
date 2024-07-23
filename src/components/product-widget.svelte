@@ -3,6 +3,7 @@
 	import { AxiosError } from 'axios';
 	import { displayMessage, getItemFromLocalStorage } from '../utils';
 	import { removeSavedProduct, saveProduct } from '../api-requests/request';
+	import { addItemToCart } from '../stores/app.store';
 
 	export let /** @type {any} */ product;
 	let /** @type {boolean} */ productIsFav = false;
@@ -15,18 +16,25 @@
 
 	onMount(() => {
 		user = getItemFromLocalStorage('ecommerce-user', true);
+		if (user) {
+			productIsFav = product.savedProducts.some(
+				(/** @type {any} */ savedProduct) => savedProduct.userId === user.userId
+			);
+		}
 	});
 
 	const handleProductFavourite = (/** @type {string} */ productId) => {
 		(async () => {
 			try {
-				// Add toggling functions here
-				if (user) {
+				if (user?.token) {
 					const headers = { Authorization: `Bearer ${user.token}` };
-					await saveProduct({ productId, userId: user.userId }, headers);
-					// Handle toggling logic later
-					// await removeSavedProduct(productId, headers);
+					if (productIsFav) {
+						await removeSavedProduct(productId, headers);
+					} else {
+						await saveProduct({ productId, userId: user.userId }, headers);
+					}
 				}
+				productIsFav = !productIsFav;
 			} catch (ex) {
 				if (ex instanceof AxiosError) {
 					const axiosErrorObject = ex.response?.data;
@@ -39,6 +47,16 @@
 				throw ex;
 			}
 		})();
+	};
+
+	const addProductToCart = (/** @type {any} */ product) => {
+		addItemToCart(product, 1);
+		const message = 'Product added to bag';
+		displayMessage({
+			message,
+			header: message,
+			type: 'success'
+		});
 	};
 </script>
 
@@ -66,6 +84,7 @@
 		</div>
 		<div class="w-full p-2">
 			<button
+				on:click={() => addProductToCart(product)}
 				class="w-full flex justify-between items-center bg-[#BFCBC6] border border-[#000] text-sm font-medium p-2"
 			>
 				<p class="cursor-pointer">Add to Bag</p>

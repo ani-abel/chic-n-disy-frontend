@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { AxiosError } from 'axios';
+	import { setProductList, productsList } from '../../../../stores/app.store';
 	import { getProducts, updateProduct } from '../../../../api-requests/request';
 	import PaginationFullControl from '../../../../components/pagination-full-control.svelte';
 	import {
@@ -30,9 +31,13 @@
 
 	onMount(() => {
 		if (data) {
-			paginationControl = data?.products.paginationControl;
-			fullPaginationList = fillArray(paginationControl.totalPages);
-			products = data.products.data;
+			setProductList(data.products);
+			const unsubscribe = productsList.subscribe((data) => {
+				paginationControl = data?.paginationControl;
+				fullPaginationList = fillArray(paginationControl.totalPages);
+				products = data.data;
+			});
+			unsubscribe();
 		}
 	});
 
@@ -42,18 +47,26 @@
 			setTimeout(async () => {
 				const result = await getProducts(formData);
 				if (result) {
-					paginationControl = data?.products.paginationControl;
-					fullPaginationList = fillArray(paginationControl.totalPages);
-					products = result.data;
+					setProductList(result);
+					const unsubscribe = productsList.subscribe((result) => {
+						paginationControl = result.paginationControl;
+						fullPaginationList = fillArray(paginationControl.totalPages);
+						products = result.data;
+					});
+					unsubscribe();
 				}
 			}, 2000);
 		} else {
 			(async () => {
 				const result = await getProducts(formData);
 				if (result) {
-					paginationControl = data?.products.paginationControl;
-					fullPaginationList = fillArray(paginationControl.totalPages);
-					products = result.data;
+					setProductList(result);
+					const unsubscribe = productsList.subscribe((result) => {
+						paginationControl = result.paginationControl;
+						fullPaginationList = fillArray(paginationControl.totalPages);
+						products = result.data;
+					});
+					unsubscribe();
 				}
 			})();
 		}
@@ -188,7 +201,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each products as product, index}
+						{#each $productsList?.data as product, index}
 							<tr id="tr">
 								<td>{index + 1}</td>
 								<td>{product.name}</td>
@@ -290,7 +303,7 @@
 				</table>
 			</div>
 			<div class="container mx-auto">
-				{#if paginationControl}
+				{#if $productsList?.paginationControl}
 					<PaginationFullControl {paginationControl} {selectedPage} {navigate} />
 				{/if}
 			</div>

@@ -8,6 +8,7 @@
 		makeProductReview,
 		saveRecentlyViewedProduct
 	} from '../../../api-requests/request';
+	import { addItemToCart } from '../../../stores/app.store';
 	import {
 		AppRole,
 		displayMessage,
@@ -16,6 +17,7 @@
 		getJwtToken
 	} from '../../../utils';
 
+	let /** @type {number} */ productQuantity = 1;
 	export /** @type {any} */ let data;
 	let /** @type {any} */ user;
 	const formData = {
@@ -35,6 +37,26 @@
 			);
 		}
 	});
+
+	const addProductToCart = (/** @type {any} */ product, /** @type {number} */ quantity) => {
+		addItemToCart(product, quantity);
+		const message = 'Product added to bag';
+		displayMessage({
+			message,
+			header: message,
+			type: 'success'
+		});
+	};
+
+	const decrementQuantity = (/** @type {any} */ product) => {
+		productQuantity = productQuantity > 1 ? (productQuantity -= 1) : 1;
+		addItemToCart(product, productQuantity);
+	};
+
+	const incrementQuantity = (/** @type {any} */ product) => {
+		productQuantity += 1;
+		addItemToCart(product, productQuantity);
+	};
 
 	const onSubmit = (/** @type {Event} */ e) => {
 		e.preventDefault();
@@ -175,12 +197,26 @@
 
 					<section class="w-full my-4 flex items-center gap-2 border-b border-black pt-4 pb-8">
 						<div class="w-fit px-3 py-2 border border-black flex flex-row items-center gap-4">
-							<button class="text-base font-semibold">-</button>
-							<p class="text-sm">1</p>
-							<button class="text-base font-semibold">+</button>
+							<button
+								type="button"
+								disabled={productQuantity <= 1}
+								on:click={() => decrementQuantity(data.product)}
+								class="text-base font-semibold">-</button
+							>
+							<p class="text-sm">{productQuantity}</p>
+							<button
+								type="button"
+								disabled={productQuantity >= data.product.quantity}
+								on:click={() => incrementQuantity(data.product)}
+								class="text-base font-semibold">+</button
+							>
 						</div>
 
-						<button class="w-full bg-black p-3 text-white text-xs font-medium uppercase">
+						<button
+							type="button"
+							on:click={() => addProductToCart(data.product, productQuantity)}
+							class="w-full bg-black p-3 text-white text-xs font-medium uppercase"
+						>
 							Add to bag | ₦&nbsp;{Number(data.product.unitPrice).toLocaleString('en-US')}
 						</button>
 					</section>

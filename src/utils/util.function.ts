@@ -19,6 +19,8 @@ export const formatDate = (dateString: string, type: 'TIME' | 'DATE' = 'TIME'): 
 	return date.toTimeString();
 };
 
+export const deleteFromLocalStorage = (key: string) => localStorage.removeItem(key);
+
 export const saveToLocalStorage = (key: string, data: string) => localStorage.setItem(key, data);
 
 export const getItemFromLocalStorage = (key: string, parseJson = true) => {

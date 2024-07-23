@@ -46,12 +46,24 @@
 						<p class="uppercase text-xs tracking-wider">Recently Viewed</p>
 					</div>
 				</a>
+				<a
+					class:nav-active={String($page.route.id).includes('/auth/customer/shipping-address')}
+					href="/auth/customer/shipping-address"
+				>
+					<div class="border-b border-[#CFD8DF] py-4">
+						<p class="uppercase text-xs tracking-wider">Shipping Address</p>
+					</div>
+				</a>
+				<a
+					class:nav-active={String($page.route.id).includes('/auth/customer/update-profile')}
+					href="/auth/customer/update-profile"
+				>
+					<div class="border-b border-[#CFD8DF] py-4">
+						<p class="uppercase text-xs tracking-wider">Profile</p>
+					</div>
+				</a>
 			</div>
-			<section class="w-full lg:w-4/5">
-				<div class="w-full grid md:grid-cols-2 gap-2">
-					<slot></slot>
-				</div>
-			</section>
+			<slot></slot>
 		</div>
 	</section>
 	<Footer />

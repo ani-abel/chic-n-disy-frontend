@@ -3,21 +3,30 @@
 	import { goto } from '$app/navigation';
 	import { apiLogin } from '../../api-requests/request';
 	import { AppRole, displayMessage, saveToLocalStorage } from '../../utils';
+	import { loggedInUser } from '../../stores/app.store';
 
 	const formData = {
 		email: null,
 		password: null
 	};
-	
+
 	const login = async (/** @type {Event} */ event) => {
 		try {
 			event.preventDefault();
 			if (formData?.email && formData?.password) {
 				const response = await apiLogin(formData.email, formData.password);
 				const {
-					data: { userId, token, role, email }
+					data: {
+						userId,
+						token,
+						role,
+						email,
+						user: { firstName, lastName }
+					}
 				} = response;
-				saveToLocalStorage('ecommerce-user', JSON.stringify({ role, userId, email, token }));
+				const newUser = { role, userId, email, token, firstName, lastName };
+				loggedInUser.set(newUser);
+				saveToLocalStorage('ecommerce-user', JSON.stringify(newUser));
 				if (role === AppRole.ADMIN) {
 					goto('/auth/admin');
 				} else {
