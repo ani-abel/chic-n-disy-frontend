@@ -305,3 +305,7 @@ button[disabled],
 .z-50 {
   z-index: 50 !important;
 }
+
+.text-underline {
+  text-decoration: underline;
+}

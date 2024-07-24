@@ -244,6 +244,8 @@
 			<!-- End 1 -->
 			<!-- 2 -->
 			<div class="relative transition-all duration-700 border-b border-[#B6BEC4]">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					on:click={() => handleClick('customerCare')}
 					on:keydown={(e) => handleKeyDown(e, 'customerCare')}

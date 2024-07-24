@@ -6,10 +6,23 @@
 	import Footer from '../../../components/footer.svelte';
 	import { getItemFromLocalStorage } from '../../../utils';
 
+	/** @type {string} */ let pageTitle = 'Orders';
+
 	onMount(() => {
 		const user = getItemFromLocalStorage('ecommerce-user', true);
 		if (!user) {
 			goto('/auth');
+		}
+		// Set title bar
+		const urlSections = String($page.route.id)?.split('/');
+		if (urlSections?.length > 0) {
+			const lastElement = urlSections[urlSections.length - 1];
+			if (lastElement?.includes('[')) {
+				pageTitle = urlSections[urlSections.length - 2];
+			} else {
+				pageTitle = lastElement;
+			}
+			pageTitle = pageTitle?.replace('-', ' ');
 		}
 	});
 </script>
@@ -18,7 +31,7 @@
 	<Nav />
 	<section class="w-full">
 		<p class="text-4xl text-black my-12 text-center playfair text-capitalize">
-			{String($page.route.id)?.split('/').pop()?.replace('-', ' ') ?? 'Orders'}
+			{pageTitle}
 		</p>
 		<div class="w-full flex flex-col xl:flex-row items-start gap-4 xl:gap-12 px-12">
 			<div class="w-full lg:w-[20%]">

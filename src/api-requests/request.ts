@@ -242,3 +242,33 @@ export const findOrderById = async (orderId: string, headers: any) => {
 	const url = `${BASE_URL}/order/${orderId}`;
 	return await httpGet<any>(url, headers);
 };
+
+export const findUserShippingAddress = async (headers: any) => {
+	const url = `${BASE_URL}/user-shipping-address`;
+	return await httpGet<any>(url, headers);
+};
+
+export const createUserShippingAddress = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/user-shipping-address/create-shipping-address`;
+	return await httpPost<any, any>(url, payload, headers);
+};
+
+export const findUserShippingAddressById = async (addressId: string) => {
+	const url = `${BASE_URL}/user-shipping-address/${addressId}`;
+	return await httpGet<any>(url);
+};
+
+export const findStates = async () => {
+	const url = `${BASE_URL}/user-shipping-address/dropdown/find-states`;
+	return await httpGet<any>(url);
+};
+
+export const findLgaByState = async (stateTag: string) => {
+	const url = `${BASE_URL}/user-shipping-address/dropdown/find-lga/${stateTag}`;
+	return await httpGet<any>(url);
+};
+
+export const updateShippingAddress = async (payload: any) => {
+	const url = `${BASE_URL}/user-shipping-address`;
+	return await httpPatch<any, any>(url, payload);
+};

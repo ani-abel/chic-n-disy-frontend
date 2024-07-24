@@ -4,7 +4,7 @@
 	import { findUserById, updateUser } from '../../../../api-requests/request';
 	import { displayMessage, getItemFromLocalStorage, getJwtToken } from '../../../../utils';
 
-    /** @type {any} */ let userObject;
+	/** @type {any} */ let userObject;
 	/** @type {any} */ const formData = {
 		firstName: null,
 		lastName: null,
@@ -61,7 +61,8 @@
 		})();
 	};
 
-	const comparePassword = () => {
+	const comparePassword = (/** @type {Event} */ e) => {
+		e.preventDefault();
 		if (formData.password !== formData.confirmPassword) {
 			const message = 'Passwords do not match';
 			displayMessage({
