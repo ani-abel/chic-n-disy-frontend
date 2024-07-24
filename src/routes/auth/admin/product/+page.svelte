@@ -14,10 +14,7 @@
 
 	export let data;
 
-	/**
-	 * @type {any[]}
-	 */
-	let products = [];
+	/** @type {any[]} */ let products = [];
 	let /** @type {any} */ paginationControl = null;
 	let fullPaginationList = null;
 	let selectedPage = 1;

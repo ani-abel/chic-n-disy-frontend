@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-	import { getItemFromLocalStorage } from '../../../utils';
+	import { AppRole, getItemFromLocalStorage } from '../../../utils';
 
 	const key = 'ecommerce-user';
 
@@ -9,6 +9,9 @@
 		const record = getItemFromLocalStorage(key);
 		if (!record) {
 			goto('/auth');
+		}
+		if (record.role !== AppRole.ADMIN) {
+			logout();
 		}
 	});
 

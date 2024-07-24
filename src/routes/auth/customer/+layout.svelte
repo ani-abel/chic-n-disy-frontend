@@ -13,6 +13,9 @@
 		if (!user) {
 			goto('/auth');
 		}
+		// if (user.role !== AppRole.ADMIN) {
+		// 	// logout();
+		// }
 		// Set title bar
 		const urlSections = String($page.route.id)?.split('/');
 		if (urlSections?.length > 0) {
