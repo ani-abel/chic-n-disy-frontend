@@ -78,7 +78,7 @@
 									</div>
 								</div>
 								{#if !product.outOfStock}
-									<a href="/product-detail/{product.id}">
+									<a href="/product-detail/{product.slug}">
 										<p class="text-[11px] underline font-medium tracking-wider uppercase">View</p>
 									</a>
 								{:else}

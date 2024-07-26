@@ -148,6 +148,15 @@ export const findProductFullDetail = async (productId: string, userId?: string) 
 	return httpGet<any>(url);
 };
 
+
+export const findProductFullDetailBySlug = async (productId: string, userId?: string) => {
+	let url = `${BASE_URL}/product/find-product/full-data/by-slug/${productId}`;
+	if (userId) {
+		url += `?userId=${userId}`;
+	}
+	return httpGet<any>(url);
+};
+
 export const makeProductReview = async (payload: any, headers: any) => {
 	const url = `${BASE_URL}/product-review`;
 	return httpPost<any, any>(url, payload, headers);

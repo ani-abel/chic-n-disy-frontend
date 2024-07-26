@@ -34,7 +34,7 @@
 			class="w-24 h-24"
 		/>
 		<div class="w-fit px-3 py-2">
-            <a href="/product-detail/{product.product.id}">
+            <a href="/product-detail/{product.product.slug}">
                 <p class="text-sm text-black pb-6">{product.product.name}</p>
             </a>
 

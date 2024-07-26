@@ -63,7 +63,7 @@
 <div class="w-full pt-10 h-fit relative">
 	<img src={imageUrl} alt={product.name} class="w-full h-[15rem]" />
 	<div class="text-center bg-[#FAF8F3]">
-		<a href="/product-detail/{product.id}">
+		<a href="/product-detail/{product.slug}">
 			<p class="font-medium text-sm">{product?.name}</p>
 			<p class="text-xs">
 				{String(product?.description).length > 30
