@@ -83,19 +83,21 @@
 	const applyFilters = (/** @type {any} */ e, /** @type {boolean} */ isSearch = false) => {
 		const value = e.target.value;
 		if (isSearch) {
+			paginationControl = null;
 			setTimeout(async () => {
 				const result = await getUsers(formData);
 				if (result) {
-					paginationControl = data?.paginationControl;
+					paginationControl = result?.paginationControl;
 					fullPaginationList = fillArray(paginationControl.totalPages);
 					users = result.data;
 				}
 			}, 2000);
 		} else {
+			paginationControl = null;
 			(async () => {
 				const result = await getUsers(formData);
 				if (result) {
-					paginationControl = data?.paginationControl;
+					paginationControl = result?.paginationControl;
 					fullPaginationList = fillArray(paginationControl.totalPages);
 					users = result.data;
 				}

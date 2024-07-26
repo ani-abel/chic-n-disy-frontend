@@ -7,8 +7,8 @@
 
 	onMount(() => {
 		const origin = window.location.origin;
-		// url = `${origin}/product-detail/${data.data.slug}`;
-		url = `https://chicndisy.com/product-detail/${data.data.slug}`;
+		url = `${origin}/product-detail/${data.data.slug}`;
+		// url = `https://chicndisy.com/product-detail/${data.data.slug}`;
 	});
 </script>
 
