@@ -130,8 +130,14 @@ export const findProductCategoryGrouping = async (
 	return httpGet<any>(url);
 };
 
-export const globalSearchForProducts = async (searchTerm: string) => {
-	const url = `${BASE_URL}/product/search/products?searchTerm=${searchTerm}`;
+export const globalSearchForProducts = async (searchTerm: string, filter: any) => {
+	let url = `${BASE_URL}/product/search/products?searchTerm=${searchTerm}`;
+	if (filter?.pageNumber) {
+		url += `&pageNumber=${filter?.pageNumber}`;
+	}
+	if (filter?.pageSize) {
+		url += `&pageSize=${filter?.pageSize}`;
+	}
 	return httpGet<any>(url);
 };
 
@@ -147,7 +153,6 @@ export const findProductFullDetail = async (productId: string, userId?: string) 
 	}
 	return httpGet<any>(url);
 };
-
 
 export const findProductFullDetailBySlug = async (productId: string, userId?: string) => {
 	let url = `${BASE_URL}/product/find-product/full-data/by-slug/${productId}`;

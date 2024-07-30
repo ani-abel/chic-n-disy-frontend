@@ -1,22 +1,54 @@
 <script>
+	import { fillArray } from '../../utils';
 	import Nav from '../../components/nav.svelte';
 	import Footer from '../../components/footer.svelte';
 	import ProductWidget from '../../components/product-widget.svelte';
 	import { globalSearchForProducts } from '../../api-requests/request';
+	import PaginationFullControl from '../../components/pagination-full-control.svelte';
 
 	const formData = {
-		searchTerm: null
+		searchTerm: null,
+		pageNumber: 1,
+		pageSize: 20,
 	};
 	let /** @type {any[]} */ searchResults = [];
+	let /** @type {any} */ paginationControl = null;
+	let fullPaginationList = null;
+	let selectedPage = 1;
 
 	const onSearch = (/** @type {Event} */ event) => {
 		event.preventDefault();
 		setTimeout(async () => {
+			paginationControl = null;
 			if (formData?.searchTerm) {
-				const results = await globalSearchForProducts(formData.searchTerm);
+				const results = await globalSearchForProducts(formData.searchTerm, {
+					pageSize: formData.pageSize,
+					pageNumber: formData.pageNumber
+				});
 				searchResults = results.data;
+				paginationControl = results?.paginationControl;
+				fullPaginationList = fillArray(paginationControl.totalPages);
 			}
 		}, 2000);
+	};
+
+	const navigate = (/** @type {Event} */ e, /** @type {number} */ page) => {
+		e.preventDefault();
+		(async () => {
+			if (formData?.searchTerm) {
+				selectedPage = page;
+				formData.pageNumber = page;
+				const results = await globalSearchForProducts(formData.searchTerm, {
+					pageSize: formData.pageSize,
+					pageNumber: formData.pageNumber
+				});
+				if (results) {
+					searchResults = results.data;
+					paginationControl = results?.paginationControl;
+					fullPaginationList = fillArray(paginationControl.totalPages);
+				}
+			}
+		})();
 	};
 </script>
 
@@ -40,19 +72,23 @@
 					</div>
 				</div>
 			</section>
-
 			<!-- Results found -->
 			<div class="w-full flex flex-col items-start gap-12 px-12">
 				{#if searchResults?.length > 0}
 					<div class="w-full pt-50">
 						<p class="text-[#520000] text-sm font-medium pb-4">
-							{searchResults?.length} search results
+							{paginationControl?.totalCount ?? 0} search results
 						</p>
 						<div class="w-full grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
 							{#each searchResults as product}
 								<ProductWidget {product} />
 							{/each}
 						</div>
+					</div>
+					<div class="container mx-auto">
+						{#if paginationControl}
+							<PaginationFullControl {paginationControl} {selectedPage} {navigate} />
+						{/if}
 					</div>
 				{:else}
 					<!-- No content found -->

@@ -7,13 +7,10 @@
 
 	export let data;
 
-	/**
-	 * @type {any[]}
-	 */
-	let users = [];
-	let /** @type {any} */ paginationControl = null;
-	let fullPaginationList = null;
 	let selectedPage = 1;
+	let fullPaginationList = null;
+	let /*** @type {any[]} */ users = [];
+	let /** @type {any} */ paginationControl = null;
 
 	const formData = {
 		role: null,
