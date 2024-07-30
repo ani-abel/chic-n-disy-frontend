@@ -6,8 +6,6 @@
 	export let /** @type {PaginationResponseType} */ paginationControl;
 	let fullPaginationList = fillArray(paginationControl.totalPages);
 
-	console.log({ selectedPage, paginationControl })
-
 	const handleNavigateWrapper = (/** @type {MouseEvent} */ e, /** @type {number} */ page) =>
 		navigate(e, page);
 </script>
