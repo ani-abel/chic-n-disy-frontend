@@ -55,7 +55,6 @@
 <section>
 	<div class="w-full">
 		<Nav />
-
 		<section class="w-full">
 			<section class="w-full flex justify-center">
 				<div class="w-10/12 md:w-6/12 lg:w-8/12 text-center">
