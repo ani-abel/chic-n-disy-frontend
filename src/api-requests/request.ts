@@ -286,3 +286,18 @@ export const updateShippingAddress = async (payload: any) => {
 	const url = `${BASE_URL}/user-shipping-address`;
 	return await httpPatch<any, any>(url, payload);
 };
+
+export const orderCheckout = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/order`;
+	return await httpPost<any, any>(url, payload, headers);
+};
+
+export const initiatePaystackPayment = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/payment/paystack/initiate-payment`;
+	return await httpPost<any, any>(url, payload, headers);
+};
+
+export const verifyPayment = async (paymentReference: string) => {
+	const url = `${BASE_URL}/payment/paystack/verify/${paymentReference}`;
+	return await httpGet(url);
+};

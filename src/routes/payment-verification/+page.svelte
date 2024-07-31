@@ -1,0 +1,1 @@
+<h1>Payment verified</h1>

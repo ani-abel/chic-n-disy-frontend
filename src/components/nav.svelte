@@ -1,15 +1,28 @@
 <script>
 	import { onMount } from 'svelte';
-	import { slide, fly, fade } from 'svelte/transition';
+	import { get } from 'svelte/store';
+	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
+	import { slide, fly, fade } from 'svelte/transition';
 	import { cart, loggedInUser } from '../stores/app.store';
-	import { AppRole, deleteFromLocalStorage, getItemFromLocalStorage, NAIRA_SIGN } from '../utils';
+	import { initiatePaystackPayment, orderCheckout } from '../api-requests/request';
+	import {
+		AppRole,
+		deleteFromLocalStorage,
+		displayMessage,
+		getItemFromLocalStorage,
+		NAIRA_SIGN
+	} from '../utils';
 	import CartItem from './cart-item.svelte';
 
-	/*** @type {boolean} */ let hide = true;
-	/*** @type {boolean} */ let hideCart = true;
-	/*** @type {boolean} */ let hideUserDropdown = true;
-	/*** @type {any} */ let user;
+	let /*** @type {boolean} */ hide = true;
+	let /*** @type {boolean} */ hideCart = true;
+	let /*** @type {boolean} */ hideUserDropdown = true;
+	let /*** @type {any} */ user;
+
+	onMount(() => {
+		user = getItemFromLocalStorage('ecommerce-user', true);
+	});
 
 	const logout = () => {
 		deleteFromLocalStorage('ecommerce-user');
@@ -17,9 +30,62 @@
 		goto('/auth');
 	};
 
-	onMount(() => {
-		user = getItemFromLocalStorage('ecommerce-user', true);
-	});
+	const onCheckout = (/*** @type {Event} */ e) => {
+		e.preventDefault();
+		if (user) {
+			if (user.role === AppRole.ADMIN) {
+				const message = 'Logged-in as admin. Cannot checkout';
+				displayMessage({
+					message,
+					type: 'danger',
+					header: message
+				});
+				return;
+			}
+			const cartSnapshot = get(cart);
+			const headers = { Authorization: `Bearer ${user.token}` };
+			const payload = {
+				amount: cartSnapshot.totalPrice,
+				products: cartSnapshot.items.map(
+					(/** @type {{ quantity: any; product: { id: any; }; }} */ item) => ({
+						quantity: item.quantity,
+						productId: item.product.id
+					})
+				)
+			};
+			(async () => {
+				try {
+					const result = await orderCheckout(payload, headers);
+					if (result?.success) {
+						const origin = window.location.origin;
+						const successUrl = `${origin}/payment-verification`;
+						const paymentResult = await initiatePaystackPayment(
+							{
+								successUrl,
+								amount: payload.amount,
+								orderId: result.data.id
+							},
+							headers
+						);
+						if (paymentResult?.success) {
+							window.location.href = paymentResult.url;
+						}
+					}
+				} catch (ex) {
+					if (ex instanceof AxiosError) {
+						const axiosErrorObject = ex.response?.data;
+						displayMessage({
+							message: axiosErrorObject?.message,
+							header: 'Error',
+							type: 'danger'
+						});
+					}
+				}
+			})();
+		} else {
+			// logout and re-navigate back
+		}
+	};
 </script>
 
 <nav>
@@ -343,6 +409,7 @@
 					</p>
 				</div>
 				<button
+					on:click={onCheckout}
 					type="button"
 					disabled={$cart.items.length <= 0}
 					class="w-full bg-black p-3 text-white text-xs font-medium uppercase"
