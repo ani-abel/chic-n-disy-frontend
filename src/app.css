@@ -46,7 +46,7 @@ th {
   width: 0;
   min-width: 100%;
   overflow: auto;
-  height: 500px;
+  min-height: 700px;
 }
 
 .backdrop {
@@ -65,13 +65,8 @@ th {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* border-radius: 10px; */
   padding: 4;
   background-color: white;
-  /* color: rgb(197, 34, 34); 
-  "email": "first.name@gmail.com",
-  "password": "first@name1",
-  */
 }
 
 .nav {
@@ -269,6 +264,14 @@ button[disabled],
 
 .text-green {
   color: rgb(17, 102, 17);
+}
+
+.text-gray {
+  color: rgb(200, 193, 193);
+}
+
+.bg-gray {
+  background: rgb(200, 193, 193) !important;
 }
 
 .bg-orange {

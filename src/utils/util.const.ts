@@ -12,6 +12,17 @@ export enum AppRole {
 	CUSTOMER = 'CUSTOMER'
 }
 
+export enum PaymentProvider {
+	PAYSTACK = 'PAYSTACK',
+	FLUTTERWAVE = 'FLUTTERWAVE'
+}
+
+export enum OrderStatus {
+	PENDING = 'PENDING',
+	SUCCESSFUL = 'SUCCESSFUL',
+	FAILED = 'FAILED'
+}
+
 export enum PaymentStatus {
 	PAID = 'PAID',
 	PENDING = 'PENDING',

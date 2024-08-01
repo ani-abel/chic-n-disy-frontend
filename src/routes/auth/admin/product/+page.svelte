@@ -61,6 +61,7 @@
 	const navigate = (/** @type {Event} */ e, /** @type {number} */ page) => {
 		e.preventDefault();
 		(async () => {
+			selectedPage = page;
 			formData.pageNumber = page;
 			const result = await getProducts(formData);
 			if (result) {

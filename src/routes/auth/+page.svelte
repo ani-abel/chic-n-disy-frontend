@@ -29,7 +29,6 @@
 					const newUser = { role, userId, email, token, firstName, lastName };
 					loggedInUser.set(newUser);
 					saveToLocalStorage('ecommerce-user', JSON.stringify(newUser));
-					// Handle redirection
 					const pageData = $page;
 					const queryParams = pageData.url.searchParams;
 					if (queryParams) {
@@ -38,7 +37,7 @@
 							goto(redirect);
 						} else {
 							if (role === AppRole.ADMIN) {
-								goto('/auth/admin');
+								goto('/auth/admin/order');
 							} else {
 								goto('/auth/customer/orders');
 							}
