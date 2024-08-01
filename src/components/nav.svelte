@@ -5,7 +5,12 @@
 	import { goto } from '$app/navigation';
 	import { slide, fly, fade } from 'svelte/transition';
 	import { cart, loggedInUser } from '../stores/app.store';
-	import { initiatePaystackPayment, orderCheckout } from '../api-requests/request';
+	import CartItem from './cart-item.svelte';
+	import {
+		initiatePaystackPayment,
+		orderCheckout,
+		validateOrderBeforePayment
+	} from '../api-requests/request';
 	import {
 		AppRole,
 		deleteFromLocalStorage,
@@ -13,7 +18,6 @@
 		getItemFromLocalStorage,
 		NAIRA_SIGN
 	} from '../utils';
-	import CartItem from './cart-item.svelte';
 
 	let /*** @type {boolean} */ hide = true;
 	let /*** @type {boolean} */ hideCart = true;
@@ -55,20 +59,27 @@
 			};
 			(async () => {
 				try {
-					const result = await orderCheckout(payload, headers);
-					if (result?.success) {
-						const origin = window.location.origin;
-						const successUrl = `${origin}/payment-verification`;
-						const paymentResult = await initiatePaystackPayment(
-							{
-								successUrl,
-								amount: payload.amount,
-								orderId: result.data.id
-							},
-							headers
-						);
-						if (paymentResult?.success) {
-							window.location.href = paymentResult.url;
+					const orderValidationResult = await validateOrderBeforePayment(
+						{ products: payload.products },
+						headers
+					);
+					if (orderValidationResult?.length > 0) {
+						const result = await orderCheckout(payload, headers);
+						if (result?.success) {
+							const origin = window.location.origin;
+							const successUrl = `${origin}/payment-verification?orderId=${result.data.id}`;
+							const paymentResult = await initiatePaystackPayment(
+								{
+									successUrl,
+									amount: payload.amount,
+									orderId: result.data.id,
+									reference: result.data.paymentReference
+								},
+								headers
+							);
+							if (paymentResult?.success) {
+								window.location.href = paymentResult.url;
+							}
 						}
 					}
 				} catch (ex) {
@@ -83,7 +94,12 @@
 				}
 			})();
 		} else {
-			// logout and re-navigate back
+			displayMessage({
+				type: 'danger',
+				header: 'Error',
+				message: 'Please login to checkout'
+			});
+			goto('/auth?redirect=/');
 		}
 	};
 </script>

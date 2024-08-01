@@ -9,7 +9,9 @@
 	onMount(async () => {
 		const user = getItemFromLocalStorage('ecommerce-user', true);
 		if (user) {
-			const result = await findOrderById(user, $page.params.orderId);
+			const result = await findOrderById($page.params.orderId, {
+				Authorization: `Bearer ${user.token}`
+			});
 			order = result.data;
 		}
 	});

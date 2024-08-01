@@ -1,49 +1,62 @@
 <script>
 	import { AxiosError } from 'axios';
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { apiLogin } from '../../api-requests/request';
-	import { AppRole, displayMessage, saveToLocalStorage } from '../../utils';
 	import { loggedInUser } from '../../stores/app.store';
+	import { AppRole, displayMessage, saveToLocalStorage } from '../../utils';
 
 	const formData = {
 		email: null,
 		password: null
 	};
 
-	const login = async (/** @type {Event} */ event) => {
-		try {
-			event.preventDefault();
-			if (formData?.email && formData?.password) {
-				const response = await apiLogin(formData.email, formData.password);
-				const {
-					data: {
-						userId,
-						token,
-						role,
-						email,
-						user: { firstName, lastName }
+	const login = (/** @type {Event} */ event) => {
+		(async () => {
+			try {
+				event.preventDefault();
+				if (formData?.email && formData?.password) {
+					const response = await apiLogin(formData.email, formData.password);
+					const {
+						data: {
+							userId,
+							token,
+							role,
+							email,
+							user: { firstName, lastName }
+						}
+					} = response;
+					const newUser = { role, userId, email, token, firstName, lastName };
+					loggedInUser.set(newUser);
+					saveToLocalStorage('ecommerce-user', JSON.stringify(newUser));
+					// Handle redirection
+					const pageData = $page;
+					const queryParams = pageData.url.searchParams;
+					if (queryParams) {
+						const redirect = queryParams.get('redirect');
+						if (redirect) {
+							goto(redirect);
+						} else {
+							if (role === AppRole.ADMIN) {
+								goto('/auth/admin');
+							} else {
+								goto('/auth/customer/orders');
+							}
+						}
 					}
-				} = response;
-				const newUser = { role, userId, email, token, firstName, lastName };
-				loggedInUser.set(newUser);
-				saveToLocalStorage('ecommerce-user', JSON.stringify(newUser));
-				if (role === AppRole.ADMIN) {
-					goto('/auth/admin');
-				} else {
-					goto('/auth/customer/orders');
 				}
+			} catch (ex) {
+				if (ex instanceof AxiosError) {
+					const axiosErrorObject = ex.response?.data;
+					displayMessage({
+						message: axiosErrorObject?.message,
+						header: 'Error',
+						type: 'danger'
+					});
+				}
+				throw ex;
 			}
-		} catch (ex) {
-			if (ex instanceof AxiosError) {
-				const axiosErrorObject = ex.response?.data;
-				displayMessage({
-					message: axiosErrorObject?.message,
-					header: 'Error',
-					type: 'danger'
-				});
-			}
-			throw ex;
-		}
+		})();
 	};
 </script>
 

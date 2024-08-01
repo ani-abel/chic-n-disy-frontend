@@ -11,3 +11,9 @@ export enum AppRole {
 	ADMIN = 'ADMIN',
 	CUSTOMER = 'CUSTOMER'
 }
+
+export enum PaymentStatus {
+	PAID = 'PAID',
+	PENDING = 'PENDING',
+	FAILED = 'FAILED'
+}

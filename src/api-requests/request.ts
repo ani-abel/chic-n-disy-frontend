@@ -218,7 +218,7 @@ export const joinNewsletter = async (payload: any) => {
 export const findUserOrderHistory = async (filter: any, headers: any) => {
 	let url = `${BASE_URL}/order/user/order-history`;
 	if (filter?.pageNumber) {
-		url += `&pageNumber=${filter?.pageNumber}`;
+		url += `?pageNumber=${filter?.pageNumber}`;
 	}
 	if (filter?.pageSize) {
 		url += `&pageSize=${filter?.pageSize}`;
@@ -299,5 +299,20 @@ export const initiatePaystackPayment = async (payload: any, headers: any) => {
 
 export const verifyPayment = async (paymentReference: string) => {
 	const url = `${BASE_URL}/payment/paystack/verify/${paymentReference}`;
-	return await httpGet(url);
+	return await httpGet<any>(url);
+};
+
+export const updateOrder = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/order`;
+	return await httpPatch<any, any>(url, payload, headers);
+};
+
+export const validateOrderBeforePayment = async (payload: any, headers: any) => {
+	const url = `${BASE_URL}/order/validate/order-before-payment`;
+	return await httpPost<any[], any>(url, payload, headers);
+};
+
+export const cancelOrder = async (orderId: string, headers: any) => {
+	const url = `${BASE_URL}/order/cancel-order/${orderId}`;
+	return await httpDelete<any>(url, headers);
 };

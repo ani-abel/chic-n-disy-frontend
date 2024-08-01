@@ -6,8 +6,8 @@ type User = {
 	userId: string;
 	token: string;
 	role: AppRole;
-	firstName: string,
-	lastName?: string,
+	firstName: string;
+	lastName?: string;
 };
 
 type CartItem = {
@@ -76,6 +76,15 @@ export const addItemToCart = (product: any, quantity = 1) => {
 		// set total price of items in cart
 		data.totalPrice = data.items.reduce((acc: any, item: any) => acc + item.price, 0);
 		return data;
+	});
+};
+
+export const resetCart = () => {
+	cart.update((data: Cart) => {
+		return {
+			items: [],
+			totalPrice: 0
+		};
 	});
 };
 
