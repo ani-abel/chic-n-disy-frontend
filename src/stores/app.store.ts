@@ -53,10 +53,11 @@ export const setProductList = (result: any) => {
 
 export const loggedInUser = writable<User | null>();
 
-export const cart = writable<Cart>({
+const cartInitialState = {
 	items: [],
 	totalPrice: 0
-});
+};
+export const cart = writable<Cart>(cartInitialState);
 
 export const addItemToCart = (product: any, quantity = 1) => {
 	cart.update((data: Cart) => {
@@ -80,12 +81,7 @@ export const addItemToCart = (product: any, quantity = 1) => {
 };
 
 export const resetCart = () => {
-	cart.update((data: Cart) => {
-		return {
-			items: [],
-			totalPrice: 0
-		};
-	});
+	cart.update((data: Cart) => ({ ...cartInitialState }));
 };
 
 export const removeItemFromCart = (productId: string) => {
