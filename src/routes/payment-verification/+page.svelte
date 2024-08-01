@@ -5,10 +5,10 @@
 	import { resetCart } from '../../stores/app.store';
 	import { cancelOrder, updateOrder, verifyPayment } from '../../api-requests/request';
 	import {
+		PaymentStatus,
 		displayMessage,
-		getItemFromLocalStorage,
 		NotificationMetaType,
-		PaymentStatus
+		getItemFromLocalStorage
 	} from '../../utils';
 
 	let /** @type {string |  null} */ orderId;
@@ -47,7 +47,7 @@
 					displayMessage(notify);
 					goto('/');
 				}
-			}, 60000);
+			}, 60000); // 1 minute
 		}
 	});
 </script>
@@ -80,7 +80,7 @@
 		height: 100%;
 		background-color: rgba(0, 0, 0, 0.5);
 		z-index: 9999;
-        /* top: 0;
+		/* top: 0;
 		left: 0; */
 	}
 
