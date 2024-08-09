@@ -174,7 +174,7 @@
 				<a href="/about">
 					<p>About Us</p>
 				</a>
-				<a href="contact-us">
+				<a href="/contact-us">
 					<p>Contact Us</p>
 				</a>
 			</div>

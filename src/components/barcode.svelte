@@ -6,11 +6,15 @@
 	let /** @type {any} */ svg;
 
 	onMount(() => {
+		// product.code = '012345678905';
 		JsBarcode('#barcode', product.code, {
+			format: 'upc',
 			width: 10,
 			height: 250,
-			// lineColor: "#0aa",
-			displayValue: true
+			lineColor: "#000",
+			displayValue: true,
+			font: 'monospace',
+			fontSize: 50,
 		});
 	});
 
