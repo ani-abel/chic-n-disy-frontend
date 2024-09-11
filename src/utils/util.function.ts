@@ -1,6 +1,7 @@
 import axios, { type AxiosResponse } from 'axios';
 import { toast } from '@zerodevx/svelte-toast';
 import type { NotificationMetaType } from './util.type';
+import { ORIGIN_URL } from '.';
 
 export const fillArray = (length = 1): number[] => {
 	const items = [];
@@ -67,7 +68,13 @@ export const displayMessage = (error: NotificationMetaType): void => {
 
 export const httpGet = async <T>(url: string, headers = {}): Promise<T> => {
 	try {
-		const response: AxiosResponse = await axios.get(url, { headers });
+		const response: AxiosResponse = await axios.get(url, {
+			headers: {
+				'X-Requested-With': 'axios',
+				origin: ORIGIN_URL,
+				...headers
+			}
+		});
 		return response.data as T;
 	} catch (ex: any) {
 		throw ex;
@@ -77,7 +84,11 @@ export const httpGet = async <T>(url: string, headers = {}): Promise<T> => {
 export const httpPost = async <U, T>(url: string, payload: T, headers = {}): Promise<U> => {
 	try {
 		const response: AxiosResponse = await axios.post(url, payload, {
-			headers
+			headers: {
+				'X-Requested-With': 'axios',
+				origin: ORIGIN_URL,
+				...headers
+			}
 		});
 		return response.data as U;
 	} catch (ex: any) {
