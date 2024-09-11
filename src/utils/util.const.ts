@@ -1,4 +1,5 @@
-export const BASE_URL = 'http://localhost:8080';
+// export const BASE_URL = 'http://localhost:8080';
+export const BASE_URL = 'http://162.254.32.201:8080';
 
 export const NAIRA_SIGN = '₦';
 
