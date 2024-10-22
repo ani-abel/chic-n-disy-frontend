@@ -10,7 +10,7 @@
 <section>
 	<div class="w-full">
 		<Nav />
-		<div class="w-full h-[70vh] lg:h-[90vh] relative">
+		<div class="w-full h-[90vh] sm:h-[30vh] md:h-[50vh] lg:h-[80vh] relative">
 			<img src="./images/perfume-1.jpeg" alt="" class="w-full h-full object-cover" />
 			<div
 				class="hidden lg:block absolute w-[40rem] bg-white bg-opacity-75 h-34 p-8 pt-4 left-[25%] top-[30%]"

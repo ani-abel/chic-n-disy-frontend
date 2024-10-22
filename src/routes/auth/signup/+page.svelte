@@ -1,5 +1,6 @@
 <script>
 	import { AxiosError } from 'axios';
+	import { goto } from '$app/navigation';
     import { AppRole, displayMessage } from '../../../utils';
 	import { createUserSignup } from '../../../api-requests/request';
 
@@ -43,6 +44,7 @@
 						type: 'success',
 						header: message
 					});
+					goto('/auth');
 					resetForm();
 				}
 			} catch (ex) {
