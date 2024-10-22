@@ -1,7 +1,7 @@
-export const BASE_URL = 'http://localhost:8080';
-export const ORIGIN_URL = 'http://localhost:5173';
-// export const ORIGIN_URL = 'https://www.chicndisy.com';
-// export const BASE_URL = `https://http-proxy-zdkj.onrender.com/http://162.254.32.201:8080`;
+// export const BASE_URL = 'http://localhost:8080';
+// export const ORIGIN_URL = 'http://localhost:5173';
+export const ORIGIN_URL = 'https://www.chicndisy.com';
+export const BASE_URL = `https://http-proxy-zdkj.onrender.com/http://162.254.32.201:8080`;
 
 export const NAIRA_SIGN = '₦';
 
