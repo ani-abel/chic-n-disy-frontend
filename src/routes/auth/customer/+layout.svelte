@@ -8,6 +8,7 @@
 
 	/** @type {string} */ let pageTitle = 'Orders';
 
+	// window.location.reload();
 	onMount(() => {
 		const user = getItemFromLocalStorage('ecommerce-user', true);
 		if (!user) {
@@ -88,7 +89,7 @@
 <style>
 	.nav-active {
 		text-decoration: underline;
-		color: #b0934a !important;
 		background-color: #cfd8de !important;
+		/* color: #FFD700 !important; */
 	}
 </style>

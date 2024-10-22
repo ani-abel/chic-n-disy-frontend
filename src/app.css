@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Peddana&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 .great-vibes-regular {
   font-family: "Italianno", cursive;
@@ -13,6 +14,13 @@
   font-family: "Playfair", serif;
   font-optical-sizing: auto;
   font-weight: 400;
+  font-style: normal;
+}
+
+.dancing-script{
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 700;
   font-style: normal;
 }
 
@@ -77,7 +85,6 @@ th {
   background-color: white;
   z-index: 50;
   display: none;
-
 }
 
 
@@ -311,4 +318,8 @@ button[disabled],
 
 .text-underline {
   text-decoration: underline;
+}
+
+.display-block {
+  display: block;
 }

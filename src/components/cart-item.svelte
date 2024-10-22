@@ -29,7 +29,7 @@
 <div class="w-full border-b border-[#000] py-4 grid grid-cols-4 items-center gap-4">
 	<div class="col-span-3 flex flex-row items-center">
 		<img
-			src={product.product.imagesForThisProduct[0].url}
+			src={product.product.imagesForThisProduct[0]?.url}
 			alt={product.product.name}
 			class="w-24 h-24"
 		/>

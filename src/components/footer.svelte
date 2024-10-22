@@ -67,10 +67,10 @@
 	};
 </script>
 
-<footer class="w-full flex justify-center mt-16 h-fit lg:h-80 bg-[#CFD8DF] p-0 pb-4 lg:p-12">
+<footer class="w-full flex justify-center mt-16 h-fit lg:h-80 bg-black p-0 pb-4 lg:p-12">
 	<div class="w-11/12 lg:w-4/5">
 		<div class="w-full hidden lg:grid grid-cols-4 gap-8">
-			<div class="text-xs capitalize">
+			<div class="text-xs capitalize text-[#FFD700]">
 				<p class="py-4 text-xs uppercase tracking-wider">Who we are</p>
 
 				<a href="#">
@@ -80,7 +80,7 @@
 				<a href="#"><p class="py-1">Products_1</p></a>
 			</div>
 
-			<div class="text-xs capitalize">
+			<div class="text-xs capitalize text-[#FFD700]">
 				<p class="py-4 text-xs uppercase tracking-wider">Customer Care</p>
 
 				<a href="#">
@@ -89,7 +89,7 @@
 				<a href="#"><p class="py-1">Contact Us</p></a>
 			</div>
 
-			<div class="text-xs capitalize">
+			<div class="text-xs capitalize text-[#FFD700]">
 				<p class="py-4 text-xs uppercase tracking-wider">more</p>
 
 				<a href="#">
@@ -100,36 +100,18 @@
 			</div>
 
 			<div>
-				<p class="py-4 text-xs uppercase tracking-wider">Be the first to know !</p>
-				<form
-					on:submit={onSubmit}
-					class="flex flex-row items-center gap-4 border-b border-[#000] bg-[#CFD8DF]"
-				>
+				<p class="py-4 text-xs uppercase tracking-wider text-[#FFD700]">Be the first to know 🔈</p>
+				<form on:submit={onSubmit}>
 					<input
-						bind:value={formData.email}
 						type="email"
+						bind:value={formData.email}
 						name="email"
-						class="w-11/12 bg-[#CFD8DF] text-black focus:outline-none text-xs pt-4 pb-2 placeholder:text-black"
+						class="w-full border-b border-[#FFD700] bg-black text-[#FFD700] focus:outline-none text-xs pt-4 pb-2 placeholder:text-[#FFD700]"
 						placeholder="Enter your email"
 					/>
-
-					<button type="submit">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							fill="currentColor"
-							class="bi bi-envelope"
-							viewBox="0 0 16 16"
-						>
-							<path
-								d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"
-							/>
-						</svg>
-					</button>
 				</form>
 
-				<div class="w-full flex items-center gap-4 my-4">
+				<div class="w-full flex items-center gap-4 my-4 text-[#FFD700]">
 					<a href="">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -190,20 +172,17 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- Footer for small devices -->
 		<div class="space-y-3 block lg:hidden">
 			<!-- 1 -->
-			<div class="relative transition-all duration-700 border-b border-[#B6BEC4] py-2">
+			<div class="relative transition-all duration-700 border-b border-[#FFD700] py-2">
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					on:click={() => handleClick('whoAreWe')}
 					on:keydown={(e) => handleKeyDown(e, 'whoAreWe')}
-					aria-expanded={footerToggle.whoAreWe}
-					aria-controls="content"
 					class="w-full p-4 text-left cursor-pointer"
 				>
-					<div class="flex items-center justify-between">
+					<div class="flex items-center justify-between text-[#FFD700]">
+						<span class="tracking-wide text-xs uppercase font-medium">Who we are</span>
 						<span class="transition-transform duration-500 transform fill-current">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -219,41 +198,39 @@
 								/>
 							</svg>
 						</span>
-						<span class="tracking-wide text-xs uppercase">Who we are</span>
-						<span class="invisible">jks</span>
 					</div>
 				</div>
+
 				{#if footerToggle.whoAreWe}
 					<div
-						class="relative transition-all duration-700"
+						class="relative overflow-hidden transition-all duration-700"
 						in:slide={{ duration: 600, delay: 300 }}
 						out:slide={{ duration: 600, delay: 300 }}
 					>
-						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
+						<div class="px-6 pb-4 text-[#FFD700] text-center text-xs capitalize">
 							<a href="#">
-								<p class="py-1 text-center">About us</p>
+								<p class="py-1 text-start">About us</p>
 							</a>
-							<a href="#"><p class="py-1 text-center">Product Safety</p></a>
-							<a href="#"><p class="py-1 text-center">Ingredient Glossary</p></a>
-							<a href="#"><p class="py-1 text-center">Tips & How-Tos</p></a>
-							<a href="#"><p class="py-1 text-center">Careers</p></a>
+							<a href="#"><p class="py-1 text-start">Product Safety</p></a>
+							<a href="#"><p class="py-1 text-start">Ingredient Glossary</p></a>
+							<a href="#"><p class="py-1 text-start">Tips & How-Tos</p></a>
+							<a href="#"><p class="py-1 text-start">Careers</p></a>
 						</div>
 					</div>
 				{/if}
 			</div>
 			<!-- End 1 -->
 			<!-- 2 -->
-			<div class="relative transition-all duration-700 border-b border-[#B6BEC4]">
+			<div class="relative transition-all duration-700 border-b border-[#FFD700]">
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					on:click={() => handleClick('customerCare')}
 					on:keydown={(e) => handleKeyDown(e, 'customerCare')}
-					aria-expanded={footerToggle.customerCare}
-					aria-controls="content"
 					class="w-full p-4 text-left cursor-pointer"
 				>
-					<div class="flex items-center justify-between">
+					<div class="flex items-center justify-between text-[#FFD700]">
+						<span class="tracking-wide text-xs uppercase font-medium">Customer Care</span>
 						<span class="transition-transform duration-500 transform fill-current">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -269,40 +246,40 @@
 								/>
 							</svg>
 						</span>
-						<span class="tracking-wide text-xs uppercase">Customer Care</span>
-						<span></span>
 					</div>
 				</div>
+
 				{#if footerToggle.customerCare}
 					<div
-						class="relative transition-all duration-700"
+						class="relative overflow-hidden transition-all duration-700"
 						in:slide={{ duration: 600, delay: 300 }}
 						out:slide={{ duration: 600, delay: 300 }}
 					>
-						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
+						<div class="px-6 pb-4 text-[#FFD700] text-center text-xs capitalize">
 							<a href="#">
-								<p class="py-1 text-center">My Account</p>
+								<p class="py-1 text-start">My Account</p>
 							</a>
-							<a href="#"><p class="py-1 text-center">Contact Us & FAQs</p></a>
-							<a href="#"><p class="py-1 text-center">Returns</p></a>
-							<a href="#"><p class="py-1 text-center">Auto-Replenishment</p></a>
-							<a href="#"><p class="py-1 text-center">Loyalty Program</p></a>
-							<a href="#"><p class="py-1 text-center">Gift Cards</p></a>
+							<a href="#"><p class="py-1 text-start">Contact Us & FAQs</p></a>
+							<a href="#"><p class="py-1 text-start">Returns</p></a>
+							<a href="#"><p class="py-1 text-start">Auto-Replenishment</p></a>
+							<a href="#"><p class="py-1 text-start">Loyalty Program</p></a>
+							<a href="#"><p class="py-1 text-start">Gift Cards</p></a>
 						</div>
 					</div>
 				{/if}
 			</div>
 			<!-- End 2 -->
 			<!-- 3 -->
-			<div class="relative transition-all duration-700 border-b border-[#B6BEC4]">
+			<div class="relative transition-all duration-700 border-b border-[#FFD700]">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					on:click={() => handleClick('more')}
 					on:keydown={(e) => handleKeyDown(e, 'more')}
-					aria-expanded={footerToggle.more}
-					aria-controls="content"
 					class="w-full p-4 text-left cursor-pointer"
 				>
-					<div class="flex items-center justify-between">
+					<div class="flex items-center justify-between text-[#FFD700]">
+						<span class="tracking-wide text-xs uppercase font-medium">More</span>
 						<span class="transition-transform duration-500 transform fill-current">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -318,29 +295,36 @@
 								/>
 							</svg>
 						</span>
-						<span class="tracking-wide text-xs uppercase">More</span>
-						<span></span>
 					</div>
 				</div>
+
 				{#if footerToggle.more}
 					<div
-						class="relative transition-all duration-700"
+						class="relative overflow-hidden transition-all duration-700"
 						in:slide={{ duration: 600, delay: 300 }}
 						out:slide={{ duration: 600, delay: 300 }}
 					>
-						<div class="px-6 pb-4 text-black text-center text-xs capitalize">
+						<div class="px-6 pb-4 text-start text-xs capitalize text-[#FFD700]">
 							<a href="#">
-								<p class="py-1 text-center">My Account</p>
+								<p class="py-1 text-start">My Account</p>
 							</a>
-							<a href="#"><p class="py-1 text-center">Contact Us & FAQs</p></a>
-							<a href="#"><p class="py-1 text-center">Returns</p></a>
+							<a href="#"><p class="py-1 text-start">Contact Us & FAQs</p></a>
+							<a href="#"><p class="py-1 text-start">Returns</p></a>
 						</div>
 					</div>
 				{/if}
 			</div>
 			<!-- End 3 -->
-			<p class="text-black text-[10px] text-center font-medium">{year} @ Laundress</p>
+
+			<p class="text-[#FFD700] text-[10px] text-center font-medium">{year} &copy;chicndisy.com</p>
 		</div>
 	</div>
+
 	<div class="w[20%] hidden lg:inline-block"></div>
 </footer>
+
+<style>
+	* {
+		font-size: 16px;
+	}
+</style>
