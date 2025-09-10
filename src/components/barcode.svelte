@@ -5,7 +5,7 @@
 	export let /** @type {any} */ product;
 	let /** @type {any} */ svg;
 
-	onMount(() => {
+	onMount(() => { 
 		JsBarcode('#barcode', product.code, {
 			width: 10,
 			height: 250,

@@ -316,7 +316,7 @@
 			</div>
 			<!-- End 3 -->
 
-			<p class="text-[#FFD700] text-[10px] text-center font-medium">{year} &copy;chicndisy.com</p>
+			<p class="text-[#FFD700] text-[10px] text-center font-medium">{year} &copy;chikndisy.com</p>
 		</div>
 	</div>
 

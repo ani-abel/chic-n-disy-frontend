@@ -134,7 +134,7 @@
 
 			<div>
 				<!-- <a href="/index.html">
-					<p class="text-xs sm:text-base lg:text-lg uppercase text-[#47484A] font-semibold tracking-widest">Chick&nbsp;'N'&nbsp;Disy</p>
+					<p class="text-xs sm:text-base lg:text-lg uppercase text-[#47484A] font-semibold tracking-widest">Chik&nbsp;'N'&nbsp;Disy</p>
 				</a>    
 				<p class="text-[9px] sm:text-[10px] tracking-widest">Lagos</p> -->
 
@@ -212,7 +212,7 @@
 			<!-- chin n disy logo -->
 			<section class="mr-0 sm:mr-32">
 				<a href="/">
-					<p class="font-bold text-xl dancing-script">Chick&nbsp;N&nbsp;Disy</p>
+					<p class="font-bold text-xl dancing-script">Chik&nbsp;N&nbsp;Disy</p>
 				</a>
 			</section>
 			<div class="flex gap-4 md:gap-8 items-center">
