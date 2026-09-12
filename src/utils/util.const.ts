@@ -1,7 +1,7 @@
 // export const BASE_URL = 'http://localhost:8080';
 // export const ORIGIN_URL = 'http://localhost:5173';
 export const ORIGIN_URL = 'https://www.chikndisy.com';
-export const BASE_URL = `https://chikndisy.duckdns.org`;
+export const BASE_URL = 'https://chikndisy.duckdns.org';
 
 export const NAIRA_SIGN = '₦';
 

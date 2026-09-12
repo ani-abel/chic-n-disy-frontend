@@ -25,6 +25,8 @@ export const deleteFromLocalStorage = (key: string) => localStorage.removeItem(k
 export const saveToLocalStorage = (key: string, data: string) => localStorage.setItem(key, data);
 
 export const getItemFromLocalStorage = (key: string, parseJson = true) => {
+	if (typeof window === 'undefined') return;
+
 	const data = localStorage.getItem(key);
 	if (parseJson) {
 		return JSON.parse(data as string);

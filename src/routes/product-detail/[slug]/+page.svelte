@@ -1,458 +1,665 @@
 <script>
-	import { onMount } from 'svelte';
-	import { AxiosError } from 'axios';
-	import Nav from '../../../components/nav.svelte';
-	import Footer from '../../../components/footer.svelte';
-	import {
-		findProductFullDetail,
-		makeProductReview,
-		saveRecentlyViewedProduct
-	} from '../../../api-requests/request';
-	import { addItemToCart } from '../../../stores/app.store';
-	import {
-		AppRole,
-		displayMessage,
-		formatDate,
-		getItemFromLocalStorage,
-		getJwtToken
-	} from '../../../utils';
+	import { goto } from '$app/navigation';
+	import { createEventDispatcher } from 'svelte';
+	import Navbar from '../../../components/v2/Navbar.svelte';
+	import Footer from '../../../components/v2/Footer.svelte';
+	import LoginModal from '../../../components/v2/Login.svelte';
+	import SignupModal from '../../../components/v2/Sign-up.svelte';
+	import Cart from '../../../components/v2/Cart.svelte';
 
-	let /** @type {number} */ productQuantity = 1;
-	export /** @type {any} */ let data;
-	let /** @type {any} */ user;
-	const formData = {
-		rating: 0,
-		title: null,
-		comment: null
+	const dispatch = createEventDispatcher();
+
+	// Props (Can be passed from +page.js/+page.server.js or default used below)
+	export let data = {product: null};
+
+// Logged in state (can come from store or auth context)
+export let isLoggedIn = false;
+export let user = null;
+
+// Primary Product State
+let product = {
+  id: 'perfume-oud-noir',
+  name: 'Oud Noir',
+  price: 95000,
+  stock: 14,
+  category: 'Woody Oriental',
+  description: 'A deep and captivating composition of warm woods, amber, and subtle spice — built to linger long after the room has emptied.',
+  rating: 4.8,
+  reviewCount: 24,
+  size: '50ml',
+  concentration: 'Eau de Parfum',
+  gender: 'Unisex',
+  longevity: '8–10 hours',
+  notes: {
+	top: ['Bergamot', 'Pink Pepper', 'Cardamom'],
+	heart: ['Rose', 'Saffron', 'Leather'],
+	base: ['Oud', 'Amber', 'Musk']
+  },
+  media: [
+	{ type: 'image', src: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle, front view' },
+	{ type: 'image', src: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle in warm light' },
+	{ type: 'image', src: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle standing alone' },
+	{ type: 'image', src: 'https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle close-up detail' },
+	{
+	  type: 'video',
+	  src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+	  poster: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80',
+	},
+  ],
+};
+
+// Related Products
+let relatedProducts = data.relatedProducts || [
+    { id: 'p1', name: 'Velours Noir', price: 68000, image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80', description: 'Dark amber, black pepper, and warm cedar. Rich and close to the skin.' },
+    { id: 'p2', name: 'Amber Dusk', price: 74000, image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=900&q=80', description: 'Golden amber, vanilla resin, and a whisper of smoke.' },
+    { id: 'p3', name: 'Santal Fumé', price: 81000, image: 'https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=900&q=80', description: 'Smoked sandalwood layered over a quiet oud base.' },
+    { id: 'p4', name: 'Bois Royal', price: 85000, image: 'https://images.pexels.com/photos/35658148/pexels-photo-35658148.jpeg', description: 'Regal oud wood tempered with rose and a hint of clove.' },
+  ];
+
+  // Gallery Active Index
+  let activeMediaIndex = 0;
+
+  // Quantity State
+  let selectedQty = 1;
+
+  // Reviews State
+  let initialReviews = [
+    { name: 'Ada O.', rating: 5, comment: 'The scent is absolutely beautiful and lasts all day. One of my favourite fragrances.', date: '2 weeks ago', verified: true },
+    { name: 'Tolu A.', rating: 5, comment: 'Compliments every time I wear this. The dry-down is unbelievably rich.', date: '3 weeks ago', verified: true },
+    { name: 'Ifeoma K.', rating: 4, comment: 'Beautiful bottle and beautiful scent. Wish it lasted a little longer on my skin type.', date: '1 month ago', verified: false },
+  ];
+
+  let extraReviews = [
+    { name: 'David E.', rating: 5, comment: 'Deep, warm, and genuinely unique. Not like anything else in my collection.', date: '1 month ago', verified: true },
+    { name: 'Grace N.', rating: 5, comment: 'Bought this for my husband and now I steal it constantly. Worth every naira.', date: '6 weeks ago', verified: true },
+  ];
+
+  let reviews = [...initialReviews];
+  let hasMoreReviews = true;
+
+  // Review Submission Form
+  let selectedRating = 0;
+  let reviewComment = '';
+  let isSubmittingReview = false;
+  let reviewFormError = '';
+  let reviewFormSuccess = false;
+
+  // Stock Status Calculation
+  $: stockStatus = (() => {
+    if (product.stock === 0) return { label: 'Out of Stock', color: 'bg-rust', text: 'text-rust', disabled: true };
+    if (product.stock <= 5) return { label: 'Limited Availability', color: 'bg-clay', text: 'text-clay', disabled: false };
+    if (product.stock < 20) return { label: 'In Stock', color: 'bg-sage', text: 'text-sage', disabled: false };
+    return { label: 'Well Stocked', color: 'bg-sage', text: 'text-sage', disabled: false };
+  })();
+
+  function formatNaira(num) {
+    return '₦' + num.toLocaleString('en-NG');
+  }
+
+  function handleDecreaseQty() {
+    if (selectedQty > 1) selectedQty -= 1;
+  }
+
+  function handleIncreaseQty() {
+    selectedQty += 1;
+  }
+
+  function handleAddToCart(itemToAdd, qty = 1) {
+    dispatch('addtocart', {
+      name: itemToAdd.name,
+      price: itemToAdd.price,
+      image: itemToAdd.image || (itemToAdd.media && itemToAdd.media[0]?.src),
+      qty
+    });
+  }
+
+  function loadMoreReviews() {
+    reviews = [...reviews, ...extraReviews];
+    hasMoreReviews = false;
+  }
+
+  function handleSubmitReview() {
+    reviewFormError = '';
+    reviewFormSuccess = false;
+
+    if (selectedRating === 0 || !reviewComment.trim()) {
+      reviewFormError = 'Please add a rating and a short comment before submitting.';
+      return;
+    }
+
+    isSubmittingReview = true;
+
+    setTimeout(() => {
+      isSubmittingReview = false;
+      const newReview = {
+        name: user?.name || 'You',
+        rating: selectedRating,
+        comment: reviewComment.trim(),
+        date: 'Just now',
+        verified: true,
+      };
+
+      reviews = [newReview, ...reviews];
+      reviewFormSuccess = true;
+      reviewComment = '';
+      selectedRating = 0;
+    }, 900);
+  }
+
+  // Mock ends here //
+  
+	// Modal & Overlay States
+	let loginModalOpen = false;
+	let signupModalOpen = false;
+	let searchOverlayOpen = false;
+  
+	// Search input element reference
+	/** @type {HTMLInputElement | undefined} */
+	let searchInputEl;
+
+	/** @type {String} */
+	let searchTerm;
+  
+	// Contact Form State
+	let fullName = '';
+	let email = '';
+	let phone = '';
+	let subject = '';
+	let message = '';
+  
+	// Form Validation & Status State
+	let errors = {
+	  fullName: false,
+	  email: false,
+	  subject: false,
+	  message: false
 	};
+  
+	let isSubmitting = false;
+	let formSuccess = false;
+	let formError = false;
+  
+	/**
+	 * @param {string} e
+	 * @returns {boolean}
+	 */
+	function validateEmail(e) {
+	  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
+	}
+  
+	function handleContactSubmit() {
+	  formSuccess = false;
+	  formError = false;
+  
+	  errors = {
+		fullName: fullName.trim().length === 0,
+		email: !validateEmail(email),
+		subject: subject.trim().length === 0,
+		message: message.trim().length === 0
+	  };
+  
+	  const hasError = Object.values(errors).some(Boolean);
+	  if (hasError) return;
+  
+	  isSubmitting = true;
+  
+	  // Mock Form Submission
+	  setTimeout(() => {
+		isSubmitting = false;
+		formSuccess = true;
+		fullName = '';
+		email = '';
+		phone = '';
+		subject = '';
+		message = '';
+	  }, 1000);
+	}
+  
+	function openSearch() {
+	  searchOverlayOpen = true;
+	  document.body.style.overflow = 'hidden';
+	  setTimeout(() => {
+		if (searchInputEl) searchInputEl.focus();
+	  }, 50);
+	}
+  
+	function closeSearch() {
+	  searchOverlayOpen = false;
+	  document.body.style.overflow = '';
+	}
+  
+	/**
+	 * @param {KeyboardEvent} e
+	 */
+	 function handleKeydown(e) {
+		if (searchOverlayOpen) {
+			if (e.key === 'Escape') closeSearch();
 
-	onMount(async () => {
-		user = getItemFromLocalStorage('ecommerce-user', true);
-		if (user?.userId && user?.role === AppRole.CUSTOMER) {
-			// If user is logged-in
-			data = await findProductFullDetail(data.product.id, user.userId);
-			await saveRecentlyViewedProduct(
-				{ userId: user.userId, productId: data.product.id },
-				{ Authorization: `Bearer ${user.token}` }
-			);
-		}
-	});
+			if (e.key === 'Enter') {
+				closeSearch();
 
-	const addProductToCart = (/** @type {any} */ product, /** @type {number} */ quantity) => {
-		addItemToCart(product, quantity);
-		const message = 'Product added to bag';
-		displayMessage({
-			message,
-			header: message,
-			type: 'success'
-		});
-	};
-
-	const decrementQuantity = (/** @type {any} */ product) => {
-		productQuantity = productQuantity > 1 ? (productQuantity -= 1) : 1;
-		addItemToCart(product, productQuantity);
-	};
-
-	const incrementQuantity = (/** @type {any} */ product) => {
-		productQuantity += 1;
-		addItemToCart(product, productQuantity);
-	};
-
-	const onSubmit = (/** @type {Event} */ e) => {
-		e.preventDefault();
-		if (formData.rating === 0) {
-			const message = 'Select a rating';
-			displayMessage({
-				message,
-				header: message,
-				type: 'danger'
-			});
-			return;
-		}
-		(async () => {
-			try {
-				const token = getJwtToken();
-				const result = await makeProductReview(
-					{ ...formData, productId: data.product.id },
-					{ Authorization: `Bearer ${token}` }
-				);
-				if (result?.success) {
-					data.reviews = [result.data, ...data.reviews];
-					const message = result.message ?? 'Submitted successfully';
-					displayMessage({
-						message,
-						header: message,
-						type: 'success'
-					});
-					resetForm();
-				}
-			} catch (ex) {
-				if (ex instanceof AxiosError) {
-					const axiosErrorObject = ex.response?.data;
-					displayMessage({
-						message: axiosErrorObject?.message,
-						header: 'Error',
-						type: 'danger'
-					});
-				}
-				throw ex;
+				// navigate
+				goto('/search?query=' + encodeURIComponent(searchTerm));
+				return;
+				
 			}
-		})();
-	};
-
-	const resetForm = () => {
-		formData.comment = null;
-		formData.rating = 0;
-		formData.title = null;
-	};
-
-	const productPictures = (data.product.imagesForThisProduct ?? []).map(
-		(/** @type {any} */ { url }) => url
-	);
-
-	const rating = data.product.rating;
-	let pictureInFocus = productPictures[0];
-	const productName = data.product.name;
-
-	let inFocus = 'image';
-	const videoInFocus = data.product?.productVideo;
-
-	const setImageInFocus = (/** @type {string} */ picture) => {
-		inFocus = 'image';
-		pictureInFocus = picture;
-	};
-</script>
-
-<svelte:head>
-	<link
-		rel="stylesheet"
-		href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+		}
+	}
+  </script>
+  
+  <svelte:head>
+	<title>Contact Us — Chikndisy</title>
+	<meta
+	  name="description"
+	  content="Get in touch with Chikndisy — questions about an order, a fragrance, or anything else. We'd love to hear from you."
 	/>
-</svelte:head>
+  </svelte:head>
+  
+  <svelte:window on:keydown={handleKeydown} />
+  
+  <!-- Shared Navigation Bar -->
+  <Navbar
+	on:openLogin={() => (loginModalOpen = true)}
+	on:openSignup={() => (signupModalOpen = true)}
+	on:openSearch={openSearch}
+  />
 
-<section>
-	<div class="w-full">
-		<Nav />
-		<section class="w-full">
-			<div class="w-full flex flex-col lg:flex-row gap-4">
-				<div
-					class="w-full lg:w-1/2 h-[75vh] p-8 flex flex-col-reverse md:flex-row items-center gap-4"
+<main class="pt-[76px]">
+	<!-- ================= PRODUCT DETAIL ================= -->
+	<section class="border-b border-line">
+	  <div class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+  
+		  <!-- ================= PRODUCT GALLERY ================= -->
+		  <div>
+			<div id="mainMediaContainer" class="relative aspect-[4/5] bg-sand overflow-hidden mb-4">
+			  {#if product.media[activeMediaIndex].type === 'image'}
+				<img 
+				  src={product.media[activeMediaIndex].src} 
+				  alt={product.media[activeMediaIndex].alt} 
+				  class="w-full h-full object-cover" 
+				/>
+			  {:else if product.media[activeMediaIndex].type === 'video'}
+				<video 
+				  src={product.media[activeMediaIndex].src} 
+				  poster={product.media[activeMediaIndex].poster} 
+				  controls 
+				  class="w-full h-full object-cover" 
+				  aria-label="{product.name} product video"
+				></video>
+			  {/if}
+			</div>
+  
+			<div id="thumbnailRow" class="flex gap-3 overflow-x-auto no-scrollbar" role="tablist" aria-label="Product media">
+			  {#each product.media as media, idx}
+				<button
+				  type="button"
+				  role="tab"
+				  aria-selected={idx === activeMediaIndex}
+				  aria-label={media.type === 'video' ? 'Play product video' : `View image ${idx + 1}`}
+				  on:click={() => (activeMediaIndex = idx)}
+				  class="relative flex-shrink-0 w-16 h-20 sm:w-20 sm:h-24 overflow-hidden border transition-colors {idx === activeMediaIndex ? 'border-ink' : 'border-line'}"
 				>
-					<div class="w-fit flex flex-row md:flex-col gap-4">
-						{#each productPictures as picture, index}
-							<button
-								class="w-16 h-16 focus:border-4 focus:border-black"
-								on:click={() => setImageInFocus(productPictures[index])}
-							>
-								<img
-									src={picture}
-									alt={productName + ' ' + index + 1}
-									class="w-full h-full object-cover"
-								/>
-							</button>
-						{/each}
-						<button
-							on:click={() => (inFocus = 'video')}
-							class="w-16 h-16 focus:border-4 focus:border-black"
-						>
-							<video src={videoInFocus} class="w-full h-full object-cover">
-								<track kind="captions" />
-							</video>
-						</button>
-					</div>
-					<div class="w-4/5 h-full">
-						{#if inFocus === 'video'}
-							<video controls src={videoInFocus} class="w-full h-full object-cover">
-								<track kind="captions" />
-							</video>
-						{:else}
-							<img src={pictureInFocus} alt={productName} class="w-full h-full object-cover" />
-						{/if}
-					</div>
-				</div>
-
-				<div class="w-full lg:w-1/2 h-fit lg:h-screen p-4 md:p-8">
-					<p class="text-3xl uppercase mt-8 playfair">{productName}</p>
-					<div class="w-full flex flex-row items-center gap-1 my-8">
-						{#each Array(5).fill(0) as _, i}
-							{#if rating >= i + 1}
-								<i class="bi bi-star-fill star"></i>
-							{:else if rating > i && rating < i + 1}
-								<i class="bi bi-star-half star"></i>
-							{:else}
-								<i class="bi bi-star star"></i>
-							{/if}
-						{/each}
-						<p class="text-sm">
-							&nbsp;{data.product.rating}&emsp;|&emsp;{data.noOfReviews ?? 0} Reviews
-						</p>
-						{#if data.product.quantity <= 10}
-							<p class="text-sm text-red">
-								&nbsp;| {data.product.quantity ?? 0} units left
-							</p>
-						{:else}
-							<p class="text-sm text-green">&nbsp;| Well Stocked</p>
-						{/if}
-					</div>
-
-					<section class="w-full my-4 flex items-center gap-2 border-b border-black pt-4 pb-8">
-						<div class="w-fit px-3 py-2 border border-black flex flex-row items-center gap-4">
-							<button
-								type="button"
-								disabled={productQuantity <= 1}
-								on:click={() => decrementQuantity(data.product)}
-								class="text-base font-semibold">-</button
-							>
-							<p class="text-sm">{productQuantity}</p>
-							<button
-								type="button"
-								disabled={productQuantity >= data.product.quantity}
-								on:click={() => incrementQuantity(data.product)}
-								class="text-base font-semibold">+</button
-							>
-						</div>
-
-						<button
-							type="button"
-							on:click={() => addProductToCart(data.product, productQuantity)}
-							class="w-full bg-black p-3 text-white text-xs font-medium uppercase"
-						>
-							Add to bag | ₦&nbsp;{Number(data.product.unitPrice).toLocaleString('en-US')}
-						</button>
-					</section>
-
-					<section class="text-sm">
-						<p class="text-sm py-8 text-justify">
-							{data.product?.description}
-						</p>
-
-						<div class="border border-black my-4">
-							<div class="relative mb-1">
-								<h6 class="mb-0">
-									<button
-										class="relative flex items-center uppercase w-full p-4
-                                    text-left transition-all ease-in
-                                    border-b border-solid cursor-pointer border-black
-                                    text-black rounded-t-1 group text-dark-500 text-sm"
-										data-collapse-target="animated-collapse-1"
-									>
-										<span>Scent</span>
-										<i
-											class="absolute right-5 pt-1 text-base transition-transform fa fa-chevron-down group-open:rotate-180"
-										></i>
-									</button>
-								</h6>
-								<div
-									data-collapse="animated-collapse-1"
-									class="h-0 overflow-hidden transition-all duration-300 ease-in-out"
-								>
-									<div class="p-4 text-sm leading-normal text-blue-gray-500/80">
-										We're not always in the position that we want to be at. We're constantly
-										growing. We're constantly making mistakes. We're constantly trying to express
-										ourselves and actualize our dreams.
-									</div>
-								</div>
-							</div>
-							<div class="relative mb-1">
-								<h6 class="mb-0">
-									<button
-										class="relative flex items-center w-full p-4
-                                    uppercase text-left transition-all ease-in
-                                    cursor-pointer text-black rounded-t-1 group text-dark-500
-                                    text-sm uppercase"
-										data-collapse-target="animated-collapse-2"
-									>
-										<span>ingredients</span>
-										<i
-											class="absolute right-5 pt-1 text-base transition-transform fa fa-chevron-down group-open:rotate-180"
-										></i>
-									</button>
-								</h6>
-								<div
-									data-collapse="animated-collapse-2"
-									class="h-0 overflow-hidden transition-all duration-300 ease-in-out"
-								>
-									<div class="p-4 text-sm leading-normal text-blue-gray-500/80">
-										We're not always in the position that we want to be at. We're constantly
-										growing. We're constantly making mistakes. We're constantly trying to express
-										ourselves and actualize our dreams.
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
-				</div>
+				  <img src={media.type === 'video' ? media.poster : media.src} alt="" class="w-full h-full object-cover" />
+				  {#if media.type === 'video'}
+					<span class="absolute inset-0 flex items-center justify-center bg-ink/25">
+					  <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><polygon points="4,2 14,8 4,14"/></svg>
+					</span>
+				  {/if}
+				</button>
+			  {/each}
 			</div>
-		</section>
-
-		<p class="text-xl uppercase py-8 lg:py-16 text-center playfair">Reviews</p>
-
-		<section class="w-full flex justify-center">
-			<div class="w-11/12 lg:w-1/2 flex flex-col lg:justify-between items-center">
-				<section class="flex gap-2">
-					<p class="font-semibold text-4xl">{data.product.rating}</p>
-					<div class="my-2">
-						<div class="flex flex-row items-center gap-2">
-							{#each Array(5).fill(0) as _, i}
-								{#if rating >= i + 1}
-									<i class="bi bi-star-fill star"></i>
-								{:else if rating > i && rating < i + 1}
-									<i class="bi bi-star-half star"></i>
-								{:else}
-									<i class="bi bi-star star"></i>
-								{/if}
-							{/each}
-						</div>
-						<p class="text-xs font-medium py-1">Based on {data.noOfReviews ?? 0} Reviews</p>
-					</div>
-				</section>
-
-				{#if user && data.userHasBoughtProduct && !data.userHasReviewedProduct}
-					<section class="h-auto flex items-center my-2 lg:my-0">
-						<button class="text-xs text-white bg-[#A5B1AA] py-2.5 font-medium px-6 rounded-xl">
-							Write a Review
-						</button>
-					</section>
+		  </div>
+  
+		  <!-- ================= PRODUCT INFORMATION ================= -->
+		  <div class="lg:pt-2">
+			<p class="text-[12px] tracking-widest2 uppercase text-clay mb-4">{product.category}</p>
+			<h1 class="font-serif text-[32px] sm:text-[40px] leading-tight mb-3">{product.name}</h1>
+			<p class="text-[15px] text-charcoal leading-relaxed mb-6 max-w-[440px]">
+			  {product.description}
+			</p>
+  
+			<div class="flex items-center gap-3 mb-1">
+			  <span class="text-[24px]">{formatNaira(product.price)}</span>
+			</div>
+  
+			<!-- Rating summary (compact, links down to full reviews) -->
+			<a href="#reviews" class="inline-flex items-center gap-2 mb-8 text-[13px] text-charcoal underline-grow">
+			  <span class="flex items-center gap-0.5 text-ink" aria-hidden="true">★★★★★</span>
+			  <span>{product.rating} · {product.reviewCount} reviews</span>
+			</a>
+  
+			<!-- ================= STOCK STATUS ================= -->
+			<div id="stockStatus" class="flex items-center gap-2 mb-8 text-[13px]">
+			  <span class="w-1.5 h-1.5 rounded-full {stockStatus.color}"></span>
+			  <span class={stockStatus.text}>{stockStatus.label}</span>
+			</div>
+  
+			<!-- Product metadata -->
+			<dl class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8 pb-8 border-b border-line text-[13px] max-w-[420px]">
+			  <div>
+				<dt class="text-charcoal/60">Size</dt>
+				<dd class="mt-0.5">{product.size}</dd>
+			  </div>
+			  <div>
+				<dt class="text-charcoal/60">Concentration</dt>
+				<dd class="mt-0.5">{product.concentration}</dd>
+			  </div>
+			  <div>
+				<dt class="text-charcoal/60">For</dt>
+				<dd class="mt-0.5">{product.gender}</dd>
+			  </div>
+			  <div>
+				<dt class="text-charcoal/60">Longevity</dt>
+				<dd class="mt-0.5">{product.longevity}</dd>
+			  </div>
+			</dl>
+  
+			<!-- ================= QUANTITY SELECTOR ================= -->
+			<div class="flex items-center gap-6 mb-6">
+			  <span class="text-[13px] tracking-[0.04em] text-charcoal">Quantity</span>
+			  <div class="flex items-center border border-line">
+				<button on:click={handleDecreaseQty} aria-label="Decrease quantity" class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">−</button>
+				<span class="w-10 text-center text-[14px]" aria-live="polite">{selectedQty}</span>
+				<button on:click={handleIncreaseQty} aria-label="Increase quantity" class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">+</button>
+			  </div>
+			</div>
+  
+			<!-- ================= ADD TO CART ================= -->
+			<button 
+			  disabled={stockStatus.disabled}
+			  on:click={() => handleAddToCart(product, selectedQty)}
+			  class="w-full sm:w-auto sm:min-w-[280px] bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors disabled:opacity-40 disabled:pointer-events-none"
+			>
+			  {stockStatus.disabled ? 'Out of Stock' : 'Add to Bag'}
+			</button>
+  
+			<!-- ================= FRAGRANCE NOTES ================= -->
+			<div class="mt-14 pt-10 border-t border-line">
+			  <h2 class="font-serif text-[20px] mb-6">Fragrance Notes</h2>
+			  <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
+				{#if product.notes?.top}
+				  <div>
+					<p class="text-[11px] tracking-widest2 uppercase text-clay mb-3">Top</p>
+					<ul class="text-[14px] text-charcoal space-y-1.5">
+					  {#each product.notes.top as note}
+						<li>{note}</li>
+					  {/each}
+					</ul>
+				  </div>
 				{/if}
+				{#if product.notes?.heart}
+				  <div>
+					<p class="text-[11px] tracking-widest2 uppercase text-clay mb-3">Heart</p>
+					<ul class="text-[14px] text-charcoal space-y-1.5">
+					  {#each product.notes.heart as note}
+						<li>{note}</li>
+					  {/each}
+					</ul>
+				  </div>
+				{/if}
+				{#if product.notes?.base}
+				  <div>
+					<p class="text-[11px] tracking-widest2 uppercase text-clay mb-3">Base</p>
+					<ul class="text-[14px] text-charcoal space-y-1.5">
+					  {#each product.notes.base as note}
+						<li>{note}</li>
+					  {/each}
+					</ul>
+				  </div>
+				{/if}
+			  </div>
 			</div>
-		</section>
-
-		{#if user && data.userHasBoughtProduct && !data.userHasReviewedProduct}
-			<!-- Display if user is logged in -->
-			<section id="give-review" class="w-full flex justify-center">
-				<div class="p-8 border-y border-bottom-none w-11/12 lg:w-3/5 my-10">
-					<form on:submit={onSubmit}>
-						<div class="my-6">
-							<label for="password" class="text-xs uppercase tracking-widest">Give a rating</label>
-							<div class="flex flex-row items-center gap-2">
-								{#each Array(5).fill(0) as _, i}
-									{#if formData.rating >= i + 1}
-										<!-- svelte-ignore a11y-click-events-have-key-events -->
-										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
-										<i
-											on:mouseover={() => (formData.rating = i + 1)}
-											on:click={() => (formData.rating = i + 1)}
-											class="cursor-pointer bi bi-star-fill star"
-										></i>
-									{:else if rating > i && rating < i + 1}
-										<!-- svelte-ignore a11y-click-events-have-key-events -->
-										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
-										<i
-											on:mouseover={() => (formData.rating = i + 1)}
-											on:click={() => (formData.rating = i + 1)}
-											class="cursor-pointer bi bi-star-half star"
-										></i>
-									{:else}
-										<!-- svelte-ignore a11y-click-events-have-key-events -->
-										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<!-- svelte-ignore a11y-mouse-events-have-key-events -->
-										<i
-											on:mouseover={() => (formData.rating = i + 1)}
-											on:click={() => (formData.rating = i + 1)}
-											class="cursor-pointer bi bi-star star"
-										></i>
-									{/if}
-								{/each}
-							</div>
-						</div>
-						<div class="my-6">
-							<label for="title" class="text-xs uppercase tracking-widest">Title</label>
-							<input
-								name="title"
-								bind:value={formData.title}
-								required
-								class="border border-black w-full p-1.5 mt-1"
-							/>
-						</div>
-						<div class="my-6">
-							<label for="comment" class="text-xs uppercase tracking-widest"
-								>Your Comment (Optional)</label
-							>
-							<textarea
-								bind:value={formData.comment}
-								rows="10"
-								class="resize-none border border-black w-full p-1.5 mt-1"
-								name="comment"
-							></textarea>
-						</div>
-						<div class="my-6 text-center">
-							<button
-								class="bg-black uppercase text-sm py-3 tracking-widest w-full text-white mt-4 mb-3"
-								type="submit"
-							>
-								Submit
-							</button>
-						</div>
-					</form>
-				</div>
-			</section>
+  
+		  </div>
+		</div>
+	  </div>
+	</section>
+  
+	<!-- ================= PRODUCT DESCRIPTION ================= -->
+	<section class="border-t border-line">
+	  <div class="max-w-[720px] mx-auto px-5 sm:px-8 py-20 sm:py-24">
+		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">The Fragrance</p>
+		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-8">A quiet kind of presence.</h2>
+  
+		<p class="text-[15px] text-charcoal leading-relaxed mb-6">
+		  Oud Noir opens with a burst of bergamot and pink pepper, sharp and bright, before quickly giving way to something warmer. Cardamom lingers just beneath the surface, adding a faint spice that never quite disappears.
+		</p>
+		<p class="text-[15px] text-charcoal leading-relaxed mb-6">
+		  As it settles, rose and saffron take the lead — rich without being sweet, softened by a thread of leather that gives the whole composition its structure. This is the heart of the fragrance, and where it spends most of its life on skin.
+		</p>
+		<p class="text-[15px] text-charcoal leading-relaxed">
+		  By the base, oud, amber, and musk take over entirely. Dark, resinous, and slow to fade, this is a fragrance built for evenings — for rooms you want to be remembered in, long after you've left them.
+		</p>
+	  </div>
+	</section>
+  
+	<!-- ================= REVIEWS ================= -->
+	<section id="reviews" class="border-t border-line">
+	  <div class="max-w-[900px] mx-auto px-5 sm:px-8 py-20 sm:py-24">
+		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">Customer Reviews</p>
+		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-12">What people are saying.</h2>
+  
+		<!-- ================= REVIEWS SUMMARY + RATING BREAKDOWN ================= -->
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-16 mb-16 pb-16 border-b border-line">
+		  <div>
+			<div class="flex items-end gap-3 mb-2">
+			  <span class="font-serif text-[48px] leading-none">4.8</span>
+			  <span class="text-[15px] text-charcoal pb-1.5">/ 5</span>
+			</div>
+			<div class="text-ink text-[16px] mb-2" aria-hidden="true">★★★★★</div>
+			<p class="text-[13px] text-charcoal">Based on 24 reviews</p>
+		  </div>
+  
+		  <div class="space-y-2.5">
+			<div class="flex items-center gap-3 text-[12px] text-charcoal">
+			  <span class="w-12 flex-shrink-0">5 Stars</span>
+			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[83%]"></div></div>
+			  <span class="w-4 flex-shrink-0 text-right">20</span>
+			</div>
+			<div class="flex items-center gap-3 text-[12px] text-charcoal">
+			  <span class="w-12 flex-shrink-0">4 Stars</span>
+			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[12%]"></div></div>
+			  <span class="w-4 flex-shrink-0 text-right">3</span>
+			</div>
+			<div class="flex items-center gap-3 text-[12px] text-charcoal">
+			  <span class="w-12 flex-shrink-0">3 Stars</span>
+			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[4%]"></div></div>
+			  <span class="w-4 flex-shrink-0 text-right">1</span>
+			</div>
+			<div class="flex items-center gap-3 text-[12px] text-charcoal">
+			  <span class="w-12 flex-shrink-0">2 Stars</span>
+			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[0%]"></div></div>
+			  <span class="w-4 flex-shrink-0 text-right">0</span>
+			</div>
+			<div class="flex items-center gap-3 text-[12px] text-charcoal">
+			  <span class="w-12 flex-shrink-0">1 Star</span>
+			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[0%]"></div></div>
+			  <span class="w-4 flex-shrink-0 text-right">0</span>
+			</div>
+		  </div>
+		</div>
+  
+		<!-- ================= REVIEW LIST ================= -->
+		<div id="reviewList" class="space-y-10 mb-4">
+		  {#each reviews as review}
+			<div class="pb-8 border-b border-line last:border-b-0">
+			  <div class="flex items-center justify-between mb-2">
+				<span class="text-[14px]">
+				  {review.name}
+				  {#if review.verified}
+					<span class="text-[11px] text-clay align-middle">· Verified Purchase</span>
+				  {/if}
+				</span>
+				<span class="text-[13px] text-charcoal">{review.date}</span>
+			  </div>
+			  <div class="text-ink text-[14px] mb-3" aria-label="{review.rating} out of 5 stars">
+				{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+			  </div>
+			  <p class="text-[14px] text-charcoal leading-relaxed">{review.comment}</p>
+			</div>
+		  {/each}
+		</div>
+  
+		{#if hasMoreReviews}
+		  <div class="text-center mb-16 pt-6">
+			<button on:click={loadMoreReviews} class="text-[13px] tracking-[0.06em] underline-grow">Load More Reviews</button>
+		  </div>
 		{/if}
-
-		<!-- reviews -->
-		<section class="w-full flex justify-center">
-			<div class="w-11/12 lg:w-3/5 my-10">
-				{#each data.reviews as review}
-					<div class="w-full p-8 border-y flex flex-col lg:justify-between gap-8">
-						<div class="">
-							<p class="text-xs font-medium playfair">
-								{review.user.firstName}
-								{#if review.user.lastName}
-									<span>{review.user.lastName}</span>
-								{/if}
-							</p>
-							<div class="text-xs text-[#A5B1AA] flex items-center gap-1">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									fill="currentColor"
-									class="bi bi-check-circle-fill"
-									viewBox="0 0 16 16"
-								>
-									<path
-										d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
-									/>
-								</svg>
-								<span class="py-1">Verified Buyer</span>
-							</div>
-						</div>
-
-						<div class="w-full lg:w-3/5">
-							<div class="flex items-center text-base gap-1">
-								{#each Array(5).fill(0) as _, i}
-									{#if review.rating >= i + 1}
-										<i class="bi bi-star-fill star"></i>
-									{:else if review.rating > i && review.rating < i + 1}
-										<i class="bi bi-star-half star"></i>
-									{:else}
-										<i class="bi bi-star star"></i>
-									{/if}
-								{/each}
-								<p class="font-medium hidden lg:inline playfair">{review.title}</p>
-							</div>
-							<p class="font-medium inline lg:hidden playfair">{review.title}</p>
-							{#if review.comment}
-								<p class="text-sm py-2 text-justify">
-									{review.comment}
-								</p>
-							{/if}
-
-							<!-- <div class="my-4">
-							<p class="font-medium text-sm">Company</p>
-							<p class="text-sm py-1">
-								We appreciate your feedback and are so happy our products are working for you!
-							</p>
-						</div> -->
-						</div>
-
-						<p>{formatDate(review.dateCreated, 'DATE')}</p>
-					</div>
-				{/each}
+  
+		<!-- ================= WRITE REVIEW ================= -->
+		<div class="pt-16 border-t border-line">
+		  <h3 class="font-serif text-[20px] mb-6">Write a Review</h3>
+  
+		  {#if !isLoggedIn}
+			<!-- Logged-out prompt -->
+			<div id="reviewAuthPrompt" class="bg-sand/60 border border-line px-6 py-8 sm:px-8 sm:py-10">
+			  <p class="text-[15px] mb-2">Want to share your experience with this fragrance?</p>
+			  <p class="text-[14px] text-charcoal mb-6">Please log in or create an account to leave a review.</p>
+			  <div class="flex flex-wrap gap-4">
+				<button on:click={() => loginModalOpen = true} class="border border-ink px-6 py-3 text-[13px] tracking-[0.06em] hover:bg-ink hover:text-paper transition-colors">Login</button>
+				<button on:click={() => signupModalOpen = true} class="text-[13px] tracking-[0.06em] underline-grow">Sign Up</button>
+			  </div>
 			</div>
-		</section>
+		  {:else}
+			<!-- Logged-in review form -->
+			<form on:submit|preventDefault={handleSubmitReview} id="reviewForm">
+			  <fieldset class="mb-6">
+				<legend class="text-[13px] tracking-[0.04em] text-charcoal mb-3">Your Rating</legend>
+				<div id="starRatingInput" class="flex items-center gap-1" role="radiogroup" aria-label="Select a star rating">
+				  {#each Array(5) as _, i}
+					{@const starVal = i + 1}
+					<button
+					  type="button"
+					  role="radio"
+					  aria-checked={starVal === selectedRating}
+					  aria-label="{starVal} star{starVal > 1 ? 's' : ''}"
+					  on:click={() => (selectedRating = starVal)}
+					  class="text-[26px] leading-none px-0.5 {starVal <= selectedRating ? 'text-ink' : 'text-line'}"
+					>
+					  ★
+					</button>
+				  {/each}
+				</div>
+			  </fieldset>
+  
+			  <label for="reviewComment" class="block text-[13px] tracking-[0.04em] text-charcoal mb-3">Your Review</label>
+			  <textarea
+				id="reviewComment"
+				bind:value={reviewComment}
+				rows="4"
+				placeholder="Share your experience with this fragrance…"
+				class="w-full bg-paper border border-line px-4 py-3 text-[14px] leading-relaxed placeholder:text-charcoal/40 focus:outline-none mb-2"
+			  ></textarea>
+  
+			  {#if reviewFormError}
+				<p class="text-[13px] text-rust mb-4">{reviewFormError}</p>
+			  {/if}
+  
+			  {#if reviewFormSuccess}
+				<p class="text-[13px] text-sage mb-4">Thank you for sharing your experience.</p>
+			  {/if}
+  
+			  <button
+				type="submit"
+				disabled={isSubmittingReview}
+				class="mt-4 bg-ink text-paper px-8 py-3.5 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors disabled:opacity-50"
+			  >
+				{isSubmittingReview ? 'Submitting…' : 'Submit Review'}
+			  </button>
+			</form>
+		  {/if}
+		</div>
+	  </div>
+	</section>
+  
+	<!-- ================= RELATED PRODUCTS ================= -->
+	<section class="border-t border-line">
+	  <div class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-20 sm:py-24">
+		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">You May Also Like</p>
+		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-12">Related Fragrances</h2>
+  
+		<div id="relatedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8">
+		  {#each relatedProducts as p (p.id || p.name)}
+			<article class="product-card group">
+			  <div class="hover-zoom relative aspect-[4/5] overflow-hidden bg-line/40 mb-5">
+				<img src={p.image} alt="{p.name} perfume bottle" class="w-full h-full object-cover" />
+			  </div>
+			  <h3 class="font-serif text-[19px] mb-1">{p.name}</h3>
+			  <p class="text-[13px] text-charcoal leading-relaxed mb-3">{p.description}</p>
+			  <div class="flex items-center justify-between">
+				<span class="text-[15px]">{formatNaira(p.price)}</span>
+				<a href={`/products/${p.id || '#'}`} class="text-[12px] tracking-[0.04em] underline-grow">View Details →</a>
+			  </div>
+			  <button
+				on:click={() => handleAddToCart(p, 1)}
+				class="related-add-btn mt-4 w-full border border-ink py-3 text-[13px] tracking-[0.06em] hover:bg-ink hover:text-paper transition-colors"
+			  >
+				Add to Bag
+			  </button>
+			</article>
+		  {/each}
+		</div>
+	  </div>
+	</section>
+  </main>
 
-		<Footer />
+<Footer />
+<Cart />
+
+<LoginModal
+  open={loginModalOpen}
+  on:close={() => (loginModalOpen = false)}
+  on:switchToSignup={() => {
+	loginModalOpen = false;
+	signupModalOpen = true;
+  }}
+/>
+
+<SignupModal
+  open={signupModalOpen}
+  on:close={() => (signupModalOpen = false)}
+  on:switchToLogin={() => {
+	signupModalOpen = false;
+	loginModalOpen = true;
+  }}
+/>
+
+{#if searchOverlayOpen}
+  <div class="fixed inset-0 z-50">
+	<button
+	  type="button"
+	  aria-label="Close search overlay background"
+	  class="absolute inset-0 bg-ink/40 w-full h-full border-none cursor-default"
+	  on:click={closeSearch}
+	></button>
+
+	<div class="relative bg-paper border-b border-line">
+	  <div class="max-w-[900px] mx-auto px-6 py-10 sm:py-14">
+		<div class="flex items-center justify-between mb-6">
+		  <span class="text-[12px] tracking-widest2 uppercase text-clay">Search</span>
+		  <button
+			type="button"
+			aria-label="Close search"
+			on:click={closeSearch}
+			class="w-8 h-8 flex items-center justify-center"
+		  >
+			<svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.3">
+			  <line x1="1" y1="1" x2="15" y2="15"/>
+			  <line x1="15" y1="1" x2="1" y2="15"/>
+			</svg>
+		  </button>
+		</div>
+		<label for="searchInput" class="sr-only">Search fragrances</label>
+		<input
+		  id="searchInput"
+		  type="text"
+		  bind:value={searchTerm}
+		  bind:this={searchInputEl}
+		  placeholder="Search fragrances, notes, collections…"
+		  class="w-full bg-transparent border-b border-ink pb-3 font-serif italic text-[24px] sm:text-[30px] placeholder:text-ink/40 focus:outline-none"
+		/>
+	  </div>
 	</div>
-</section>
+  </div>
+{/if}

@@ -316,3 +316,8 @@ export const cancelOrder = async (orderId: string, headers: any) => {
 	const url = `${BASE_URL}/order/cancel-order/${orderId}`;
 	return await httpDelete<any>(url, headers);
 };
+
+export const sendContactMessage = async (payload: any) => {
+	const url = `${BASE_URL}/contact-message`;
+	return await httpPost<any, any>(url, payload);
+};

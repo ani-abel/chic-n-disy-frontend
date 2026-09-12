@@ -2,18 +2,17 @@
 	import { onMount } from 'svelte';
 	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
-    import Cart from '../../../components/v2/Cart.svelte';
-	import Navbar from '../../../components/v2/Navbar.svelte';
-	import Footer from '../../../components/v2/Footer.svelte';
-	import { getProducts, removeSavedProduct, saveProduct } from '../../../api-requests/request';
-	import LoginModal from '../../../components/v2/Login.svelte';
-	import SignupModal from '../../../components/v2/Sign-up.svelte';
-	import Pagination from '../../../components/v2/Pagination.svelte';
-	import { cartOpen, cart, formatNaira, auth } from '../../../stores/cart.store';
-	import { displayMessage, getItemFromLocalStorage } from '../../../utils';
-
+    import Cart from '../../components/v2/Cart.svelte';
+	import Navbar from '../../components/v2/Navbar.svelte';
+	import Footer from '../../components/v2/Footer.svelte';
+	import LoginModal from '../../components/v2/Login.svelte';
+	import SignupModal from '../../components/v2/Sign-up.svelte';
+	import Pagination from '../../components/v2/Pagination.svelte';
+    import { displayMessage, getItemFromLocalStorage } from '../../utils';
+	import { cartOpen, cart, formatNaira, auth } from '../../stores/cart.store';
+	import { getProducts, removeSavedProduct, saveProduct } from '../../api-requests/request';
+    
 	export let data;
-	const { category } = data;
 
   $: pageData = data.products.data;
   $: paginationControl = data.products.paginationControl;
@@ -134,7 +133,6 @@ async function toggleFavorite(productId) {
 	const page = p.detail;
 	const result = await getProducts({
 		outOfStock: false,
-		productCategoryId: category.id,
 		pageNumber: page,
 		pageSize: PAGE_SIZE
 	});
@@ -206,7 +204,7 @@ async function toggleFavorite(productId) {
   </script>
   
   <svelte:head>
-	<title>{category.name} — Chikndisy</title>
+	<title>Shop — Chikndisy</title>
 	<meta
 	  name="description"
 	  content="Get in touch with Chikndisy — questions about an order, a fragrance, or anything else. We'd love to hear from you."
@@ -226,15 +224,13 @@ async function toggleFavorite(productId) {
 	<!-- ================= CATEGORY HEADER ================= -->
 	<section class="pt-[76px]">
 	  <div class="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 pt-14 sm:pt-16 pb-10 sm:pb-12">
-		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-4">Category</p>
+		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-4">All</p>
 		<h1 class="font-serif text-[32px] sm:text-[42px] leading-[1.1] mb-4">
-			{category.name}
+			Shop
 		</h1>
-		{#if category.description}
 		<p class="text-[15px] text-charcoal leading-relaxed max-w-[520px]">
-			{category.description}
-		  </p>
-		{/if}
+			Explore our full selection of luxury fragrances.
+		</p>
 		{#if total > 0}
 		  <p id="resultsContext" class="mt-6 text-[13px] text-charcoal/70">
 			Showing {start + 1}–{Math.min(start + PAGE_SIZE, total)} of {total} fragrances

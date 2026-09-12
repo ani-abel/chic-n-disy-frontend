@@ -199,6 +199,15 @@
 						</div>
 					</a>
 					<a
+						class:sm-custom-link-active={$page.route.id === '/shop'}
+						class="custom-link"
+						href="/shop"
+					>
+						<div class="pb-4 border-b pl-8 py-4">
+							<p>Shop</p>
+						</div>
+					</a>
+					<a
 						class:sm-custom-link-active={$page.route.id === '/contact-us'}
 						class="custom-link"
 						href="/contact-us"
