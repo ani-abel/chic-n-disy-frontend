@@ -1,6 +1,10 @@
-import { findProductFullDetailBySlug } from '../../../api-requests/request';
+import { findProductFullDetailBySlug, findRelatedProducts } from '../../../api-requests/request';
 
 export async function load({ params }) {
-	// return findProductFullDetailBySlug(params.slug);
-	return {};
+	const [product, relatedProducts] = await Promise.all([
+		findProductFullDetailBySlug(params.slug),
+		findRelatedProducts(params.slug)
+	]);
+
+	return { product, relatedProducts };
 }

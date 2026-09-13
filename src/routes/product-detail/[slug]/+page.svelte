@@ -1,20 +1,30 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import Navbar from '../../../components/v2/Navbar.svelte';
 	import Footer from '../../../components/v2/Footer.svelte';
 	import LoginModal from '../../../components/v2/Login.svelte';
 	import SignupModal from '../../../components/v2/Sign-up.svelte';
 	import Cart from '../../../components/v2/Cart.svelte';
+	import { auth, cart, cartOpen, formatNaira } from '../../../stores/cart.store';
 
 	const dispatch = createEventDispatcher();
 
 	// Props (Can be passed from +page.js/+page.server.js or default used below)
-	export let data = {product: null};
+	export let data;
 
-// Logged in state (can come from store or auth context)
-export let isLoggedIn = false;
-export let user = null;
+	const { product: pageData, relatedProducts } = data
+
+	console.log({pageData, data});
+
+	// Logged in state (can come from store or auth context)
+	export let isLoggedIn = false;
+	export let user = null;
+
+	onMount(() => {
+		user = $auth.user;
+		isLoggedIn = $auth.isLoggedIn;
+	});
 
 // Primary Product State
 let product = {
@@ -48,13 +58,21 @@ let product = {
   ],
 };
 
-// Related Products
-let relatedProducts = data.relatedProducts || [
-    { id: 'p1', name: 'Velours Noir', price: 68000, image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80', description: 'Dark amber, black pepper, and warm cedar. Rich and close to the skin.' },
-    { id: 'p2', name: 'Amber Dusk', price: 74000, image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=900&q=80', description: 'Golden amber, vanilla resin, and a whisper of smoke.' },
-    { id: 'p3', name: 'Santal Fumé', price: 81000, image: 'https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=900&q=80', description: 'Smoked sandalwood layered over a quiet oud base.' },
-    { id: 'p4', name: 'Bois Royal', price: 85000, image: 'https://images.pexels.com/photos/35658148/pexels-photo-35658148.jpeg', description: 'Regal oud wood tempered with rose and a hint of clove.' },
-  ];
+
+  const gallery = [
+		...pageData.product.imagesForThisProduct.map(({ url }) => ({ 
+			url, 
+			type: 'image',
+			alt: pageData.name
+	 	})),
+		...(pageData.product.productVideo 
+			? [{ 
+				url: pageData.product.productVideo, 
+				type: 'video', 
+				alt: pageData.product.name 
+			   }] 
+			: []),
+	];
 
   // Gallery Active Index
   let activeMediaIndex = 0;
@@ -92,25 +110,28 @@ let relatedProducts = data.relatedProducts || [
     return { label: 'Well Stocked', color: 'bg-sage', text: 'text-sage', disabled: false };
   })();
 
-  function formatNaira(num) {
-    return '₦' + num.toLocaleString('en-NG');
+  let quantity = 0;
+
+
+  const handleAddToCart = (
+	/** @type {any} */ product, 
+	/** @type {Number} */ qty = 1
+  ) => {
+	// Call addItem(product, price, quantity)
+	cart.addItem(product, product.unitPrice, qty);
+
+	// Optional: open the cart drawer overlay
+	cartOpen.set(true);
   }
 
-  function handleDecreaseQty() {
+  function handleDecreaseQty(/** @type {any} */  product) {
     if (selectedQty > 1) selectedQty -= 1;
+	cart.updateQty(product.id, selectedQty);
   }
 
-  function handleIncreaseQty() {
+  function handleIncreaseQty(/** @type {any} */  product) {
     selectedQty += 1;
-  }
-
-  function handleAddToCart(itemToAdd, qty = 1) {
-    dispatch('addtocart', {
-      name: itemToAdd.name,
-      price: itemToAdd.price,
-      image: itemToAdd.image || (itemToAdd.media && itemToAdd.media[0]?.src),
-      qty
-    });
+	cart.updateQty(product.id, selectedQty)
   }
 
   function loadMoreReviews() {
@@ -248,7 +269,7 @@ let relatedProducts = data.relatedProducts || [
   </script>
   
   <svelte:head>
-	<title>Contact Us — Chikndisy</title>
+	<title>{pageData.product.name} — Chikndisy</title>
 	<meta
 	  name="description"
 	  content="Get in touch with Chikndisy — questions about an order, a fragrance, or anything else. We'd love to hear from you."
@@ -273,39 +294,53 @@ let relatedProducts = data.relatedProducts || [
 		  <!-- ================= PRODUCT GALLERY ================= -->
 		  <div>
 			<div id="mainMediaContainer" class="relative aspect-[4/5] bg-sand overflow-hidden mb-4">
-			  {#if product.media[activeMediaIndex].type === 'image'}
+			  {#if gallery[activeMediaIndex].type === 'image'}
 				<img 
-				  src={product.media[activeMediaIndex].src} 
-				  alt={product.media[activeMediaIndex].alt} 
+				  src={gallery[activeMediaIndex].url} 
+				  alt={gallery[activeMediaIndex].alt} 
 				  class="w-full h-full object-cover" 
+				  loading="eager"
 				/>
-			  {:else if product.media[activeMediaIndex].type === 'video'}
+			  {:else if gallery[activeMediaIndex].type === 'video'}
 				<video 
-				  src={product.media[activeMediaIndex].src} 
-				  poster={product.media[activeMediaIndex].poster} 
-				  controls 
-				  class="w-full h-full object-cover" 
-				  aria-label="{product.name} product video"
-				></video>
+				  src={gallery[activeMediaIndex].url} 
+				  controls={false}
+				  preload="metadata"
+				  autoplay
+				  class="w-full h-full object-cover"
+				  aria-label="{pageData.product.name} product video"
+				>
+					<track kind="captions" />
+			    </video>
 			  {/if}
 			</div>
   
 			<div id="thumbnailRow" class="flex gap-3 overflow-x-auto no-scrollbar" role="tablist" aria-label="Product media">
-			  {#each product.media as media, idx}
+			  {#each gallery as media, idx}
 				<button
 				  type="button"
 				  role="tab"
 				  aria-selected={idx === activeMediaIndex}
 				  aria-label={media.type === 'video' ? 'Play product video' : `View image ${idx + 1}`}
-				  on:click={() => (activeMediaIndex = idx)}
+				  on:click={() => {
+					const i = (activeMediaIndex = idx)
+					console.log({tt: i})
+
+					return (activeMediaIndex = idx)
+				  }}
 				  class="relative flex-shrink-0 w-16 h-20 sm:w-20 sm:h-24 overflow-hidden border transition-colors {idx === activeMediaIndex ? 'border-ink' : 'border-line'}"
 				>
-				  <img src={media.type === 'video' ? media.poster : media.src} alt="" class="w-full h-full object-cover" />
-				  {#if media.type === 'video'}
-					<span class="absolute inset-0 flex items-center justify-center bg-ink/25">
-					  <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><polygon points="4,2 14,8 4,14"/></svg>
-					</span>
-				  {/if}
+				{#if media.type === 'image'}
+				  <img src={media.url} 
+				  	alt={media.alt} 
+					class="w-full h-full object-cover" 
+					loading="lazy" 
+				   />
+				{:else}
+					<video src={media.url} class="w-full h-full object-cover" controls={false}>
+						<track kind="captions" />
+					</video>
+				{/if}
 				</button>
 			  {/each}
 			</div>
@@ -313,14 +348,20 @@ let relatedProducts = data.relatedProducts || [
   
 		  <!-- ================= PRODUCT INFORMATION ================= -->
 		  <div class="lg:pt-2">
-			<p class="text-[12px] tracking-widest2 uppercase text-clay mb-4">{product.category}</p>
-			<h1 class="font-serif text-[32px] sm:text-[40px] leading-tight mb-3">{product.name}</h1>
+			<p class="text-[12px] tracking-widest2 uppercase text-clay mb-4">
+				{pageData.product.productCategory?.name}
+			</p>
+			<h1 class="font-serif text-[32px] sm:text-[40px] leading-tight mb-3">
+				{pageData.product.name}
+			</h1>
 			<p class="text-[15px] text-charcoal leading-relaxed mb-6 max-w-[440px]">
-			  {product.description}
+			  {pageData.product.description}
 			</p>
   
 			<div class="flex items-center gap-3 mb-1">
-			  <span class="text-[24px]">{formatNaira(product.price)}</span>
+				<span class="text-[24px]">
+					{formatNaira(pageData.product.unitPrice)}
+				</span>
 			</div>
   
 			<!-- Rating summary (compact, links down to full reviews) -->
@@ -359,16 +400,26 @@ let relatedProducts = data.relatedProducts || [
 			<div class="flex items-center gap-6 mb-6">
 			  <span class="text-[13px] tracking-[0.04em] text-charcoal">Quantity</span>
 			  <div class="flex items-center border border-line">
-				<button on:click={handleDecreaseQty} aria-label="Decrease quantity" class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">−</button>
+				<button type="button" 
+					on:click={() => handleDecreaseQty(data.product)} 
+					aria-label="Decrease quantity" 
+					class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">
+					−
+				</button>
 				<span class="w-10 text-center text-[14px]" aria-live="polite">{selectedQty}</span>
-				<button on:click={handleIncreaseQty} aria-label="Increase quantity" class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">+</button>
+				<button type="button" 
+					on:click={() => handleIncreaseQty(data.product)} 
+					aria-label="Increase quantity" 
+					class="w-10 h-10 flex items-center justify-center text-[15px] hover:bg-sand">
+					+
+				</button>
 			  </div>
 			</div>
   
 			<!-- ================= ADD TO CART ================= -->
 			<button 
 			  disabled={stockStatus.disabled}
-			  on:click={() => handleAddToCart(product, selectedQty)}
+			  on:click={() => handleAddToCart(data.product, selectedQty)}
 			  class="w-full sm:w-auto sm:min-w-[280px] bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors disabled:opacity-40 disabled:pointer-events-none"
 			>
 			  {stockStatus.disabled ? 'Out of Stock' : 'Add to Bag'}
@@ -580,16 +631,20 @@ let relatedProducts = data.relatedProducts || [
 		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-12">Related Fragrances</h2>
   
 		<div id="relatedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8">
-		  {#each relatedProducts as p (p.id || p.name)}
+		  {#each relatedProducts.data as p (p.id || p.name)}
+		  {@const imageUrl = p.imagesForThisProduct[0].url}
 			<article class="product-card group">
 			  <div class="hover-zoom relative aspect-[4/5] overflow-hidden bg-line/40 mb-5">
-				<img src={p.image} alt="{p.name} perfume bottle" class="w-full h-full object-cover" />
+				<img src={imageUrl} 
+					alt="{p.name} perfume bottle" 
+					class="w-full h-full object-cover" 
+				/>
 			  </div>
 			  <h3 class="font-serif text-[19px] mb-1">{p.name}</h3>
 			  <p class="text-[13px] text-charcoal leading-relaxed mb-3">{p.description}</p>
 			  <div class="flex items-center justify-between">
-				<span class="text-[15px]">{formatNaira(p.price)}</span>
-				<a href={`/products/${p.id || '#'}`} class="text-[12px] tracking-[0.04em] underline-grow">View Details →</a>
+				<span class="text-[15px]">{formatNaira(p.unitPrice)}</span>
+				<a href={`/products/${p.slug}`} class="text-[12px] tracking-[0.04em] underline-grow">View Details →</a>
 			  </div>
 			  <button
 				on:click={() => handleAddToCart(p, 1)}

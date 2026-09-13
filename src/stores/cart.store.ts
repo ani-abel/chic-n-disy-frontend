@@ -54,14 +54,26 @@ function createCartStore() {
 		 * @param index Array index of the item in the cart
 		 * @param delta Change in quantity (e.g., +1 or -1)
 		 */
-		updateQty: (index: number, delta: number) => {
+		updateQty: (productId: string, newQuantity: number) => {
 			update((items) => {
-				if (!items[index]) return items;
-				items[index].quantity += delta;
-				if (items[index].quantity <= 0) {
-					items.splice(index, 1);
+				const index = items.findIndex((i) => i.product?.id === productId);
+
+				// If product is not in the cart, return early
+				if (index === -1) return items;
+
+				// Immutable update pattern
+				const updatedItems = [...items];
+
+				if (newQuantity <= 0) {
+					updatedItems.splice(index, 1);
+				} else {
+					updatedItems[index] = {
+						...updatedItems[index],
+						quantity: newQuantity
+					};
 				}
-				return [...items];
+
+				return updatedItems;
 			});
 		},
 

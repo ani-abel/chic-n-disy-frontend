@@ -205,6 +205,11 @@ export const findSavedProducts = async (filter: any, headers: any) => {
 	return await httpGet<any>(url, headers);
 };
 
+export const findRelatedProducts = async (productId: string, limit = 4) => {
+	const url = `${BASE_URL}/product/related-products/${productId}/?limit=${limit}`;
+	return httpGet<any>(url);
+};
+
 export const removeSavedProduct = async (productId: string, headers: any) => {
 	const url = `${BASE_URL}/saved-product/${productId}`;
 	return await httpDelete<any>(url, headers);
