@@ -9,19 +9,19 @@
 	import LoginModal from '../../../components/v2/Login.svelte';
 	import SignupModal from '../../../components/v2/Sign-up.svelte';
 	import { auth, cart, cartOpen, formatNaira } from '../../../stores/cart.store';
-	import { makeProductReview, sendContactMessage } from '../../../api-requests/request';
+	import { findProductFullDetailBySlug, makeProductReview, sendContactMessage } from '../../../api-requests/request';
+	import { page } from '$app/stores';
 
 	// Props (Can be passed from +page.js/+page.server.js or default used below)
 	export let data;
 
-	const { product: pageData, relatedProducts, reviewSummary } = data;
+	const { relatedProducts, reviewSummary } = data;
+	let { product: pageData } = data;
 
 	// Logged in state (can come from store or auth context)
 	export let isLoggedIn = false;
 	/** @type {any} */
 	export let user = null;
-
-	$: userCanReview = isLoggedIn && !pageData.userHasBoughtProduct && !pageData.userHasReviewedProduct;
 
 	const notificationFormData = {
 		email: null,
@@ -70,9 +70,15 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		user = $auth.user;
 		isLoggedIn = $auth.isLoggedIn;
+
+		const slug = $page.params.slug;
+
+		if (isLoggedIn && slug && user?.userId) {
+			pageData = await findProductFullDetailBySlug(slug, user.userId);
+		}
 	});
 
 	function splitDescription(description = '') {
@@ -662,7 +668,7 @@
 		<div class="pt-16 border-t border-line">
 		  <h3 class="font-serif text-[20px] mb-6">Write a Review</h3>
   
-		  {#if !userCanReview}
+		  {#if isLoggedIn && pageData.userHasBoughtProduct && !pageData.userHasReviewedProduct}
 			<!-- Logged-out prompt -->
 			<div id="reviewAuthPrompt" class="bg-sand/60 border border-line px-6 py-8 sm:px-8 sm:py-10">
 			  <p class="text-[15px] mb-2">Want to share your experience with this fragrance?</p>
