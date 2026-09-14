@@ -248,7 +248,7 @@
         </p>
     
         <!-- ================= CALL TO ACTION ================= -->
-        <a href="#" class="inline-block bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors">
+        <a href="/shop" class="inline-block bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors">
             Explore Our Collection
         </a>
         </div>
