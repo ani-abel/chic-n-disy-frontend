@@ -324,7 +324,5 @@
 </footer>
 
 <style>
-	* {
-		font-size: 16px;
-	}
+	* { font-size: 16px; }
 </style>

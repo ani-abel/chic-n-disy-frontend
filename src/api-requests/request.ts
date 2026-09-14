@@ -162,6 +162,11 @@ export const findProductFullDetailBySlug = async (productId: string, userId?: st
 	return httpGet<any>(url);
 };
 
+export const productReviewSummary = async (productId: string) => {
+	const url = `${BASE_URL}/product-review/summary/${productId}`;
+	return httpGet<any>(url);
+};
+
 export const makeProductReview = async (payload: any, headers: any) => {
 	const url = `${BASE_URL}/product-review`;
 	return httpPost<any, any>(url, payload, headers);
@@ -203,6 +208,11 @@ export const findSavedProducts = async (filter: any, headers: any) => {
 		url += `&searchTerm=${filter?.searchTerm}`;
 	}
 	return await httpGet<any>(url, headers);
+};
+
+export const findRelatedProducts = async (productId: string, limit = 4) => {
+	const url = `${BASE_URL}/product/related-products/${productId}/?limit=${limit}`;
+	return httpGet<any>(url);
 };
 
 export const removeSavedProduct = async (productId: string, headers: any) => {
@@ -315,4 +325,9 @@ export const validateOrderBeforePayment = async (payload: any, headers: any) => 
 export const cancelOrder = async (orderId: string, headers: any) => {
 	const url = `${BASE_URL}/order/cancel-order/${orderId}`;
 	return await httpDelete<any>(url, headers);
+};
+
+export const sendContactMessage = async (payload: any) => {
+	const url = `${BASE_URL}/contact-message`;
+	return await httpPost<any, any>(url, payload);
 };

@@ -6,7 +6,8 @@
 	export let data;
 
 	const formData = {
-		name: data.data.name
+		name: data.data.name,
+		description: data.data.description,
 	};
 
 	const onSubmit = (/** @type {Event} */ e) => {
@@ -60,6 +61,17 @@
 						name="name"
 						class="border border-black w-full p-1.5 mt-1"
 					/>
+				</div>
+
+				<div class="my-6">
+					<label for="name" class="text-xs uppercase tracking-widest">Description</label>
+					<textarea 
+						required 
+						maxlength="1200"
+						rows="5" 
+						name="description"
+						class="border border-black w-full p-1.5 mt-1" 
+						bind:value={formData.description}></textarea>
 				</div>
 				<div class="my-6 text-center">
 					<input

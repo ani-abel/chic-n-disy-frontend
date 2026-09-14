@@ -3,7 +3,8 @@
 	import { displayMessage, getJwtToken } from '../../../../../utils';
 
 	const formData = {
-		name: null
+		name: null,
+		description: null
 	};
 
 	const onSubmit = (/** @type {Event} */ e) => {
@@ -35,11 +36,23 @@
 				<div class="my-6">
 					<label for="name" class="text-xs uppercase tracking-widest">Name</label>
 					<input
+						required
 						bind:value={formData.name}
 						type="text"
 						name="name"
 						class="border border-black w-full p-1.5 mt-1"
 					/>
+				</div>
+
+				<div class="my-6">
+					<label for="name" class="text-xs uppercase tracking-widest">Description</label>
+					<textarea 
+						required 
+						maxlength="1200"
+						rows="5" 
+						name="description"
+						class="border border-black w-full p-1.5 mt-1" 
+						bind:value={formData.description}></textarea>
 				</div>
 
 				<div class="my-6 text-center">
