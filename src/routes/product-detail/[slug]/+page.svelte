@@ -1,77 +1,113 @@
 <script>
+	import { onMount } from 'svelte';
+	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import Cart from '../../../components/v2/Cart.svelte';
 	import Navbar from '../../../components/v2/Navbar.svelte';
 	import Footer from '../../../components/v2/Footer.svelte';
+	import { displayMessage, getJwtToken } from '../../../utils';
 	import LoginModal from '../../../components/v2/Login.svelte';
 	import SignupModal from '../../../components/v2/Sign-up.svelte';
-	import Cart from '../../../components/v2/Cart.svelte';
 	import { auth, cart, cartOpen, formatNaira } from '../../../stores/cart.store';
-
-	const dispatch = createEventDispatcher();
+	import { makeProductReview, sendContactMessage } from '../../../api-requests/request';
 
 	// Props (Can be passed from +page.js/+page.server.js or default used below)
 	export let data;
 
-	const { product: pageData, relatedProducts } = data
-
-	console.log({pageData, data});
+	const { product: pageData, relatedProducts, reviewSummary } = data;
 
 	// Logged in state (can come from store or auth context)
 	export let isLoggedIn = false;
+	/** @type {any} */
 	export let user = null;
+
+	$: userCanReview = isLoggedIn && !pageData.userHasBoughtProduct && !pageData.userHasReviewedProduct;
+
+	const notificationFormData = {
+		email: null,
+		firstName: '[Unknown]',
+		lastName: '[Unknown]',
+		phoneNumber: '[Unknown]',
+		subject: "Product question",
+		message: `Notify me when this product is available [Code: ${pageData.product.code}, Name:${pageData.product.name}]`,
+	};
+
+	/**
+	 * @param {Event} e
+	 */
+	const handleProductNotificationSubmit = async (e) => {
+		e.preventDefault();
+
+		if (isLoggedIn) {
+			notificationFormData.firstName = user.firstName;
+			notificationFormData.lastName = user.lastName;
+			// notificationFormData.phoneNumber = user.phoneNumber;
+		}
+
+		try {
+			const result = await sendContactMessage(notificationFormData);
+			if (result?.success) { 
+				const message = result.message ?? 'We will get back to you soon';
+				displayMessage({
+					message,
+					header: message,
+					type: 'success'
+				});
+
+				setTimeout(() => location.reload(), 700);
+			}
+			return;
+		} catch (ex) {
+			if (ex instanceof AxiosError) {
+				const axiosErrorObject = ex.response?.data;
+				displayMessage({
+					message: axiosErrorObject?.message,
+					header: 'Error',
+					type: 'danger'
+				});
+			}
+			throw ex;
+		}
+	}
 
 	onMount(() => {
 		user = $auth.user;
 		isLoggedIn = $auth.isLoggedIn;
 	});
 
-// Primary Product State
-let product = {
-  id: 'perfume-oud-noir',
-  name: 'Oud Noir',
-  price: 95000,
-  stock: 14,
-  category: 'Woody Oriental',
-  description: 'A deep and captivating composition of warm woods, amber, and subtle spice — built to linger long after the room has emptied.',
-  rating: 4.8,
-  reviewCount: 24,
-  size: '50ml',
-  concentration: 'Eau de Parfum',
-  gender: 'Unisex',
-  longevity: '8–10 hours',
-  notes: {
-	top: ['Bergamot', 'Pink Pepper', 'Cardamom'],
-	heart: ['Rose', 'Saffron', 'Leather'],
-	base: ['Oud', 'Amber', 'Musk']
-  },
-  media: [
-	{ type: 'image', src: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle, front view' },
-	{ type: 'image', src: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle in warm light' },
-	{ type: 'image', src: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle standing alone' },
-	{ type: 'image', src: 'https://images.unsplash.com/photo-1615634260167-c8cdede054de?auto=format&fit=crop&w=1200&q=80', alt: 'Oud Noir perfume bottle close-up detail' },
-	{
-	  type: 'video',
-	  src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-	  poster: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80',
-	},
-  ],
-};
+	function splitDescription(description = '') {
+		return description.split('.').map((w) => w.trim());
+	}
 
+	$: descriptionSentences = splitDescription(pageData.product.description);
 
-  const gallery = [
+	// Function to extract gender from description text
+	function getGender(description = '') {
+		const text = description.toLowerCase();
+
+		if (/\b(unisex)\b/.test(text)) return 'Unisex';
+		if (/\b(women|woman|female)\b/.test(text)) return 'Female';
+		if (/\b(men|man|male)\b/.test(text)) return 'Male';
+
+		return 'Unisex'; // Default fallback if unspecified
+	}
+
+  	$: detectedGender = getGender(pageData?.product?.description);
+
+	const gallery = [
 		...pageData.product.imagesForThisProduct.map(({ url }) => ({ 
 			url, 
 			type: 'image',
 			alt: pageData.name
-	 	})),
+		})),
 		...(pageData.product.productVideo 
 			? [{ 
 				url: pageData.product.productVideo, 
 				type: 'video', 
 				alt: pageData.product.name 
-			   }] 
-			: []),
+			}] 
+			: 
+		[]),
 	];
 
   // Gallery Active Index
@@ -80,37 +116,12 @@ let product = {
   // Quantity State
   let selectedQty = 1;
 
-  // Reviews State
-  let initialReviews = [
-    { name: 'Ada O.', rating: 5, comment: 'The scent is absolutely beautiful and lasts all day. One of my favourite fragrances.', date: '2 weeks ago', verified: true },
-    { name: 'Tolu A.', rating: 5, comment: 'Compliments every time I wear this. The dry-down is unbelievably rich.', date: '3 weeks ago', verified: true },
-    { name: 'Ifeoma K.', rating: 4, comment: 'Beautiful bottle and beautiful scent. Wish it lasted a little longer on my skin type.', date: '1 month ago', verified: false },
-  ];
-
-  let extraReviews = [
-    { name: 'David E.', rating: 5, comment: 'Deep, warm, and genuinely unique. Not like anything else in my collection.', date: '1 month ago', verified: true },
-    { name: 'Grace N.', rating: 5, comment: 'Bought this for my husband and now I steal it constantly. Worth every naira.', date: '6 weeks ago', verified: true },
-  ];
-
-  let reviews = [...initialReviews];
-  let hasMoreReviews = true;
+  let reviews = [...data.product.reviews];
+  let hasMoreReviews = false;
 
   // Review Submission Form
   let selectedRating = 0;
-  let reviewComment = '';
   let isSubmittingReview = false;
-  let reviewFormError = '';
-  let reviewFormSuccess = false;
-
-  // Stock Status Calculation
-  $: stockStatus = (() => {
-    if (product.stock === 0) return { label: 'Out of Stock', color: 'bg-rust', text: 'text-rust', disabled: true };
-    if (product.stock <= 5) return { label: 'Limited Availability', color: 'bg-clay', text: 'text-clay', disabled: false };
-    if (product.stock < 20) return { label: 'In Stock', color: 'bg-sage', text: 'text-sage', disabled: false };
-    return { label: 'Well Stocked', color: 'bg-sage', text: 'text-sage', disabled: false };
-  })();
-
-  let quantity = 0;
 
 
   const handleAddToCart = (
@@ -124,50 +135,77 @@ let product = {
 	cartOpen.set(true);
   }
 
-  function handleDecreaseQty(/** @type {any} */  product) {
+  const handleDecreaseQty = (/** @type {any} */  product) => {
     if (selectedQty > 1) selectedQty -= 1;
 	cart.updateQty(product.id, selectedQty);
   }
 
-  function handleIncreaseQty(/** @type {any} */  product) {
+  const handleIncreaseQty = (/** @type {any} */  product) => {
     selectedQty += 1;
 	cart.updateQty(product.id, selectedQty)
   }
 
   function loadMoreReviews() {
-    reviews = [...reviews, ...extraReviews];
+	reviews = [...reviews];
+    // reviews = [...reviews, ...extraReviews];
     hasMoreReviews = false;
   }
 
-  function handleSubmitReview() {
-    reviewFormError = '';
-    reviewFormSuccess = false;
+  const formData = {
+	comment: null
+  };
 
-    if (selectedRating === 0 || !reviewComment.trim()) {
-      reviewFormError = 'Please add a rating and a short comment before submitting.';
-      return;
-    }
-
-    isSubmittingReview = true;
-
-    setTimeout(() => {
-      isSubmittingReview = false;
-      const newReview = {
-        name: user?.name || 'You',
-        rating: selectedRating,
-        comment: reviewComment.trim(),
-        date: 'Just now',
-        verified: true,
-      };
-
-      reviews = [newReview, ...reviews];
-      reviewFormSuccess = true;
-      reviewComment = '';
-      selectedRating = 0;
-    }, 900);
+  function resetForm() { 
+	formData.comment = null;
   }
 
-  // Mock ends here //
+  async function handleSubmitReview(/** @type {Event} */ e) {
+	e.preventDefault();
+
+	isSubmittingReview = true;
+
+	const payload = { 
+		...formData,
+		title: 'User review',
+		rating: selectedRating, 
+		productId: pageData.product.id,
+	};
+
+	try {
+		const token = getJwtToken();
+		const result = await makeProductReview(
+			payload,
+			{ Authorization: `Bearer ${token}` }
+		);
+		if (result?.success) {
+			isSubmittingReview = false;
+
+			const message = result.message ?? 'Submitted successfully';
+			displayMessage({
+				message,
+				header: message,
+				type: 'success'
+			});
+			resetForm();
+
+			setTimeout(() => location.reload(), 700);
+		}
+	} catch (ex) {
+		isSubmittingReview = false;
+
+		if (ex instanceof AxiosError) {
+			const axiosErrorObject = ex.response?.data;
+			displayMessage({
+				message: axiosErrorObject?.message,
+				header: 'Error',
+				type: 'danger'
+			});
+		}
+		throw ex;
+	}
+  }
+
+  function fmtDate(d) { return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); }
   
 	// Modal & Overlay States
 	let loginModalOpen = false;
@@ -180,61 +218,6 @@ let product = {
 
 	/** @type {String} */
 	let searchTerm;
-  
-	// Contact Form State
-	let fullName = '';
-	let email = '';
-	let phone = '';
-	let subject = '';
-	let message = '';
-  
-	// Form Validation & Status State
-	let errors = {
-	  fullName: false,
-	  email: false,
-	  subject: false,
-	  message: false
-	};
-  
-	let isSubmitting = false;
-	let formSuccess = false;
-	let formError = false;
-  
-	/**
-	 * @param {string} e
-	 * @returns {boolean}
-	 */
-	function validateEmail(e) {
-	  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
-	}
-  
-	function handleContactSubmit() {
-	  formSuccess = false;
-	  formError = false;
-  
-	  errors = {
-		fullName: fullName.trim().length === 0,
-		email: !validateEmail(email),
-		subject: subject.trim().length === 0,
-		message: message.trim().length === 0
-	  };
-  
-	  const hasError = Object.values(errors).some(Boolean);
-	  if (hasError) return;
-  
-	  isSubmitting = true;
-  
-	  // Mock Form Submission
-	  setTimeout(() => {
-		isSubmitting = false;
-		formSuccess = true;
-		fullName = '';
-		email = '';
-		phone = '';
-		subject = '';
-		message = '';
-	  }, 1000);
-	}
   
 	function openSearch() {
 	  searchOverlayOpen = true;
@@ -262,7 +245,6 @@ let product = {
 				// navigate
 				goto('/search?query=' + encodeURIComponent(searchTerm));
 				return;
-				
 			}
 		}
 	}
@@ -322,12 +304,7 @@ let product = {
 				  role="tab"
 				  aria-selected={idx === activeMediaIndex}
 				  aria-label={media.type === 'video' ? 'Play product video' : `View image ${idx + 1}`}
-				  on:click={() => {
-					const i = (activeMediaIndex = idx)
-					console.log({tt: i})
-
-					return (activeMediaIndex = idx)
-				  }}
+				  on:click={() => (activeMediaIndex = idx)}
 				  class="relative flex-shrink-0 w-16 h-20 sm:w-20 sm:h-24 overflow-hidden border transition-colors {idx === activeMediaIndex ? 'border-ink' : 'border-line'}"
 				>
 				{#if media.type === 'image'}
@@ -355,7 +332,7 @@ let product = {
 				{pageData.product.name}
 			</h1>
 			<p class="text-[15px] text-charcoal leading-relaxed mb-6 max-w-[440px]">
-			  {pageData.product.description}
+			  {descriptionSentences[0]}
 			</p>
   
 			<div class="flex items-center gap-3 mb-1">
@@ -364,38 +341,56 @@ let product = {
 				</span>
 			</div>
   
+			{#if reviewSummary}
+			{@const review = reviewSummary.data}
+			{@const totalReviews = review.totalReviews ?? 0}
+			{@const filledStars = Math.round(review?.averageRating ?? 0)}
 			<!-- Rating summary (compact, links down to full reviews) -->
 			<a href="#reviews" class="inline-flex items-center gap-2 mb-8 text-[13px] text-charcoal underline-grow">
-			  <span class="flex items-center gap-0.5 text-ink" aria-hidden="true">★★★★★</span>
-			  <span>{product.rating} · {product.reviewCount} reviews</span>
+			  <span class="flex items-center gap-0.5 text-ink" aria-hidden="true">
+				{'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
+			  </span>
+			  <span>
+				{Number(filledStars).toFixed(1)} · { totalReviews} review{totalReviews=== 1 ? '' : 's'}
+			 </span>
 			</a>
+			{/if}
   
 			<!-- ================= STOCK STATUS ================= -->
 			<div id="stockStatus" class="flex items-center gap-2 mb-8 text-[13px]">
-			  <span class="w-1.5 h-1.5 rounded-full {stockStatus.color}"></span>
-			  <span class={stockStatus.text}>{stockStatus.label}</span>
+			  <span class="w-1.5 h-1.5 rounded-full {pageData.product.outOfStock ? 'bg-rust' : 'bg-sage'}"></span>
+				{#if pageData.product.outOfStock}
+				<span class="text-rust">Out of Stock</span>
+				{:else}
+				<span class="text-sage">In Stock</span>
+				{/if}
 			</div>
   
 			<!-- Product metadata -->
 			<dl class="grid grid-cols-2 gap-y-3 gap-x-6 mb-8 pb-8 border-b border-line text-[13px] max-w-[420px]">
 			  <div>
 				<dt class="text-charcoal/60">Size</dt>
-				<dd class="mt-0.5">{product.size}</dd>
+				<dd class="mt-0.5">
+					{pageData.product.description.match(/\(([^)]+)\)/)?.[1] ?? 'Standard'}
+				</dd>
 			  </div>
 			  <div>
-				<dt class="text-charcoal/60">Concentration</dt>
-				<dd class="mt-0.5">{product.concentration}</dd>
+				<dt class="text-charcoal/60">Category</dt>
+				<dd class="mt-0.5 capitalize">
+					{pageData.product.productCategory?.name ?? 'General'}
+				</dd>
 			  </div>
 			  <div>
 				<dt class="text-charcoal/60">For</dt>
-				<dd class="mt-0.5">{product.gender}</dd>
+				<dd class="mt-0.5">{detectedGender}</dd>
 			  </div>
 			  <div>
-				<dt class="text-charcoal/60">Longevity</dt>
-				<dd class="mt-0.5">{product.longevity}</dd>
+				<dt class="text-charcoal/60">Code</dt>
+				<dd class="mt-0.5">{pageData.product.code}</dd>
 			  </div>
 			</dl>
   
+			{#if !pageData.product.outOfStock}
 			<!-- ================= QUANTITY SELECTOR ================= -->
 			<div class="flex items-center gap-6 mb-6">
 			  <span class="text-[13px] tracking-[0.04em] text-charcoal">Quantity</span>
@@ -418,15 +413,53 @@ let product = {
   
 			<!-- ================= ADD TO CART ================= -->
 			<button 
-			  disabled={stockStatus.disabled}
+			  disabled={pageData.product.outOfStock}
 			  on:click={() => handleAddToCart(data.product, selectedQty)}
 			  class="w-full sm:w-auto sm:min-w-[280px] bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors disabled:opacity-40 disabled:pointer-events-none"
 			>
-			  {stockStatus.disabled ? 'Out of Stock' : 'Add to Bag'}
+			  {pageData.product.outOfStock ? 'Out of Stock' : 'Add to Bag'}
 			</button>
-  
+			{:else}
+			<!-- ========================================== -->
+			<!-- 2. NOTIFY ME WHEN AVAILABLE SECTION        -->
+			<!-- (Replaces main Add to Bag CTA when stock = 0) -->
+			<!-- ========================================== -->
+			<div class="w-full space-y-3 p-5 bg-terracotta/5 border border-terracotta/20 rounded-none">
+				<div class="flex items-start gap-3">
+					<svg class="w-5 h-5 text-terracotta mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+					</svg>
+					<div>
+						<h4 class="font-serif text-sm font-semibold text-charcoal">Currently Out of Stock</h4>
+						<p class="text-xs text-charcoal/70 mt-0.5 font-sans leading-relaxed">
+							Enter your email address below and we'll send you an instant notification as soon as this piece is back in stock.
+						</p>
+					</div>
+				</div>
+
+				<form on:submit|preventDefault={handleProductNotificationSubmit} class="mt-3 space-y-2">
+					<div class="flex flex-col sm:flex-row gap-2">
+						<input 
+							type="email" 
+							required 
+							bind:value={notificationFormData.email}
+							placeholder="Enter your email" 
+							class="flex-1 bg-[#FAF8F3] border border-clay/30 px-3 py-2.5 text-xs text-charcoal placeholder-charcoal/40 focus:outline-none focus:border-clay transition-colors font-sans"
+						/>
+						<button 
+							type="submit" 
+							class="bg-clay text-[#FAF8F3] hover:bg-charcoal transition-colors duration-300 px-5 py-2.5 text-xs tracking-widest uppercase font-semibold whitespace-nowrap"
+						>
+							Notify Me
+						</button>
+					</div>
+					<p class="text-[10px] text-charcoal/50 italic font-sans">We respect your privacy and will only email you regarding this item's availability.</p>
+				</form>
+			</div>
+			{/if}
+			
 			<!-- ================= FRAGRANCE NOTES ================= -->
-			<div class="mt-14 pt-10 border-t border-line">
+			<!-- <div class="mt-14 pt-10 border-t border-line">
 			  <h2 class="font-serif text-[20px] mb-6">Fragrance Notes</h2>
 			  <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
 				{#if product.notes?.top}
@@ -460,7 +493,7 @@ let product = {
 				  </div>
 				{/if}
 			  </div>
-			</div>
+			</div> -->
   
 		  </div>
 		</div>
@@ -471,16 +504,10 @@ let product = {
 	<section class="border-t border-line">
 	  <div class="max-w-[720px] mx-auto px-5 sm:px-8 py-20 sm:py-24">
 		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">The Fragrance</p>
-		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-8">A quiet kind of presence.</h2>
+		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-8 capitalize">{pageData.product.name}</h2>
   
 		<p class="text-[15px] text-charcoal leading-relaxed mb-6">
-		  Oud Noir opens with a burst of bergamot and pink pepper, sharp and bright, before quickly giving way to something warmer. Cardamom lingers just beneath the surface, adding a faint spice that never quite disappears.
-		</p>
-		<p class="text-[15px] text-charcoal leading-relaxed mb-6">
-		  As it settles, rose and saffron take the lead — rich without being sweet, softened by a thread of leather that gives the whole composition its structure. This is the heart of the fragrance, and where it spends most of its life on skin.
-		</p>
-		<p class="text-[15px] text-charcoal leading-relaxed">
-		  By the base, oud, amber, and musk take over entirely. Dark, resinous, and slow to fade, this is a fragrance built for evenings — for rooms you want to be remembered in, long after you've left them.
+		  {pageData.product.description}
 		</p>
 	  </div>
 	</section>
@@ -491,45 +518,58 @@ let product = {
 		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">Customer Reviews</p>
 		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-12">What people are saying.</h2>
   
+		{#if reviewSummary}
+		{@const review = reviewSummary.data}
+		{@const totalReviews = review.totalReviews ?? 0}
+		{@const filledStars = Math.round(review?.averageRating ?? 0)}
 		<!-- ================= REVIEWS SUMMARY + RATING BREAKDOWN ================= -->
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-16 mb-16 pb-16 border-b border-line">
 		  <div>
 			<div class="flex items-end gap-3 mb-2">
-			  <span class="font-serif text-[48px] leading-none">4.8</span>
+			  <span class="font-serif text-[48px] leading-none">
+				{Number(filledStars).toFixed(1)}
+			  </span>
 			  <span class="text-[15px] text-charcoal pb-1.5">/ 5</span>
 			</div>
-			<div class="text-ink text-[16px] mb-2" aria-hidden="true">★★★★★</div>
-			<p class="text-[13px] text-charcoal">Based on 24 reviews</p>
+			<div class="text-ink text-[16px] mb-2" aria-hidden="true">
+				{'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
+			  </div>
+			<p class="text-[13px] text-charcoal">
+				Based on {totalReviews} review{totalReviews === 1 ? '' : 's'}
+			</p>
 		  </div>
   
 		  <div class="space-y-2.5">
-			<div class="flex items-center gap-3 text-[12px] text-charcoal">
-			  <span class="w-12 flex-shrink-0">5 Stars</span>
-			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[83%]"></div></div>
-			  <span class="w-4 flex-shrink-0 text-right">20</span>
-			</div>
-			<div class="flex items-center gap-3 text-[12px] text-charcoal">
-			  <span class="w-12 flex-shrink-0">4 Stars</span>
-			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[12%]"></div></div>
-			  <span class="w-4 flex-shrink-0 text-right">3</span>
-			</div>
-			<div class="flex items-center gap-3 text-[12px] text-charcoal">
-			  <span class="w-12 flex-shrink-0">3 Stars</span>
-			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[4%]"></div></div>
-			  <span class="w-4 flex-shrink-0 text-right">1</span>
-			</div>
-			<div class="flex items-center gap-3 text-[12px] text-charcoal">
-			  <span class="w-12 flex-shrink-0">2 Stars</span>
-			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[0%]"></div></div>
-			  <span class="w-4 flex-shrink-0 text-right">0</span>
-			</div>
-			<div class="flex items-center gap-3 text-[12px] text-charcoal">
-			  <span class="w-12 flex-shrink-0">1 Star</span>
-			  <div class="flex-1 h-1 bg-line"><div class="rating-bar-fill h-1 bg-ink w-[0%]"></div></div>
-			  <span class="w-4 flex-shrink-0 text-right">0</span>
-			</div>
+			{#if review?.breakdown}
+			  {#each review.breakdown as item (item.stars)}
+				{@const percentage = review.totalReviews > 0 
+				  ? Math.round((item.count / review.totalReviews) * 100) 
+				  : 0}
+				
+				<div class="flex items-center gap-3 text-[12px] text-charcoal">
+				  <!-- Star Label -->
+				  <span class="w-12 flex-shrink-0">
+					{item.stars} {item.stars === 1 ? 'Star' : 'Stars'}
+				  </span>
+				  
+				  <!-- Progress Bar Container -->
+				  <div class="flex-1 h-1 bg-line">
+					<div 
+					  class="rating-bar-fill h-1 bg-ink transition-all duration-300"
+					  style="width: {percentage}%;"
+					></div>
+				  </div>
+		  
+				  <!-- Count Label -->
+				  <span class="w-4 flex-shrink-0 text-right">
+					{item.count}
+				  </span>
+				</div>
+			  {/each}
+			{/if}
 		  </div>
 		</div>
+		{/if}
   
 		<!-- ================= REVIEW LIST ================= -->
 		<div id="reviewList" class="space-y-10 mb-4">
@@ -537,12 +577,16 @@ let product = {
 			<div class="pb-8 border-b border-line last:border-b-0">
 			  <div class="flex items-center justify-between mb-2">
 				<span class="text-[14px]">
-				  {review.name}
+				  <span class="capitalize">
+					{review.user.firstName} {review.user.lastName}
+				  </span>
 				  {#if review.verified}
 					<span class="text-[11px] text-clay align-middle">· Verified Purchase</span>
 				  {/if}
 				</span>
-				<span class="text-[13px] text-charcoal">{review.date}</span>
+				<span class="text-[13px] text-charcoal">
+					{fmtDate(new Date(review.dateCreated))}
+				</span>
 			  </div>
 			  <div class="text-ink text-[14px] mb-3" aria-label="{review.rating} out of 5 stars">
 				{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
@@ -562,14 +606,20 @@ let product = {
 		<div class="pt-16 border-t border-line">
 		  <h3 class="font-serif text-[20px] mb-6">Write a Review</h3>
   
-		  {#if !isLoggedIn}
+		  {#if !userCanReview}
 			<!-- Logged-out prompt -->
 			<div id="reviewAuthPrompt" class="bg-sand/60 border border-line px-6 py-8 sm:px-8 sm:py-10">
 			  <p class="text-[15px] mb-2">Want to share your experience with this fragrance?</p>
 			  <p class="text-[14px] text-charcoal mb-6">Please log in or create an account to leave a review.</p>
 			  <div class="flex flex-wrap gap-4">
-				<button on:click={() => loginModalOpen = true} class="border border-ink px-6 py-3 text-[13px] tracking-[0.06em] hover:bg-ink hover:text-paper transition-colors">Login</button>
-				<button on:click={() => signupModalOpen = true} class="text-[13px] tracking-[0.06em] underline-grow">Sign Up</button>
+				<button on:click={() => loginModalOpen = true} 
+					class="border border-ink px-6 py-3 text-[13px] tracking-[0.06em] hover:bg-ink hover:text-paper transition-colors">
+					Login
+				</button>
+				<button on:click={() => signupModalOpen = true} 
+					class="text-[13px] tracking-[0.06em] underline-grow">
+					Sign Up
+				</button>
 			  </div>
 			</div>
 		  {:else}
@@ -597,19 +647,11 @@ let product = {
 			  <label for="reviewComment" class="block text-[13px] tracking-[0.04em] text-charcoal mb-3">Your Review</label>
 			  <textarea
 				id="reviewComment"
-				bind:value={reviewComment}
+				bind:value={formData.comment}
 				rows="4"
 				placeholder="Share your experience with this fragrance…"
 				class="w-full bg-paper border border-line px-4 py-3 text-[14px] leading-relaxed placeholder:text-charcoal/40 focus:outline-none mb-2"
 			  ></textarea>
-  
-			  {#if reviewFormError}
-				<p class="text-[13px] text-rust mb-4">{reviewFormError}</p>
-			  {/if}
-  
-			  {#if reviewFormSuccess}
-				<p class="text-[13px] text-sage mb-4">Thank you for sharing your experience.</p>
-			  {/if}
   
 			  <button
 				type="submit"
@@ -644,7 +686,7 @@ let product = {
 			  <p class="text-[13px] text-charcoal leading-relaxed mb-3">{p.description}</p>
 			  <div class="flex items-center justify-between">
 				<span class="text-[15px]">{formatNaira(p.unitPrice)}</span>
-				<a href={`/products/${p.slug}`} class="text-[12px] tracking-[0.04em] underline-grow">View Details →</a>
+				<a href={`/product-detail/${p.slug}`} class="text-[12px] tracking-[0.04em] underline-grow">View Details →</a>
 			  </div>
 			  <button
 				on:click={() => handleAddToCart(p, 1)}
@@ -718,3 +760,7 @@ let product = {
 	</div>
   </div>
 {/if}
+
+<style>
+.capitalize { text-transform: capitalize !important; }
+</style>

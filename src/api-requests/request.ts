@@ -162,6 +162,11 @@ export const findProductFullDetailBySlug = async (productId: string, userId?: st
 	return httpGet<any>(url);
 };
 
+export const productReviewSummary = async (productId: string) => {
+	const url = `${BASE_URL}/product-review/summary/${productId}`;
+	return httpGet<any>(url);
+};
+
 export const makeProductReview = async (payload: any, headers: any) => {
 	const url = `${BASE_URL}/product-review`;
 	return httpPost<any, any>(url, payload, headers);

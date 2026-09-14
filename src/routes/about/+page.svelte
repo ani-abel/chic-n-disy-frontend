@@ -44,7 +44,6 @@
 				// navigate
 				goto('/search?query=' + encodeURIComponent(searchTerm));
 				return;
-				
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios';
 import { toast } from '@zerodevx/svelte-toast';
-import type { NotificationMetaType } from './util.type';
 import { ORIGIN_URL } from './index';
+import type { NotificationMetaType } from './util.type';
 
 export const fillArray = (length = 1): number[] => {
 	const items = [];

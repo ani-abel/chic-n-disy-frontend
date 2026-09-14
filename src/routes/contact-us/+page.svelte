@@ -55,14 +55,6 @@
 	let isSubmitting = false;
 	let formSuccess = false;
 	let formError = false;
-  
-	/**
-	 * @param {string} e
-	 * @returns {boolean}
-	 */
-	function validateEmail(e) {
-	  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
-	}
 
 	/**
 	 * @param {Event} e
@@ -74,7 +66,6 @@
 			return;
 		}
 		const user = getItemFromLocalStorage('ecommerce-user', true);
-		console.log({user});
 
 		try {
 			const { fullName, ...data } = formData;
@@ -119,34 +110,6 @@
 			}
 			throw ex;
 		}
-	}
-  
-	function handleContactSubmit() {
-	  formSuccess = false;
-	  formError = false;
-  
-	  errors = {
-		fullName: fullName.trim().length === 0,
-		email: !validateEmail(email),
-		subject: subject.trim().length === 0,
-		message: message.trim().length === 0
-	  };
-  
-	  const hasError = Object.values(errors).some(Boolean);
-	  if (hasError) return;
-  
-	  isSubmitting = true;
-  
-	  // Mock Form Submission
-	  setTimeout(() => {
-		isSubmitting = false;
-		formSuccess = true;
-		fullName = '';
-		email = '';
-		phone = '';
-		subject = '';
-		message = '';
-	  }, 1000);
 	}
   
 	function openSearch() {
