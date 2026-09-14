@@ -414,7 +414,7 @@
 			<!-- ================= ADD TO CART ================= -->
 			<button 
 			  disabled={pageData.product.outOfStock}
-			  on:click={() => handleAddToCart(data.product, selectedQty)}
+			  on:click={() => handleAddToCart(pageData.product, selectedQty)}
 			  class="w-full sm:w-auto sm:min-w-[280px] bg-ink text-paper px-9 py-4 text-[13px] tracking-[0.08em] hover:bg-charcoal transition-colors disabled:opacity-40 disabled:pointer-events-none"
 			>
 			  {pageData.product.outOfStock ? 'Out of Stock' : 'Add to Bag'}
@@ -500,16 +500,72 @@
 	  </div>
 	</section>
   
-	<!-- ================= PRODUCT DESCRIPTION ================= -->
+	<!-- ================= PRODUCT DESCRIPTION / FRAGRANCE STORY ================= -->
 	<section class="border-t border-line">
-	  <div class="max-w-[720px] mx-auto px-5 sm:px-8 py-20 sm:py-24">
-		<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">The Fragrance</p>
-		<h2 class="font-serif text-[26px] sm:text-[30px] leading-tight mb-8 capitalize">{pageData.product.name}</h2>
-  
-		<p class="text-[15px] text-charcoal leading-relaxed mb-6">
-		  {pageData.product.description}
-		</p>
-	  </div>
+		<div class="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 py-20 sm:py-24 lg:py-28">
+	
+		<!-- Intro -->
+		<div class="max-w-[780px] mb-14 sm:mb-16">
+			<p class="text-[12px] tracking-widest2 uppercase text-clay mb-5">
+			The Art of Scent
+			</p>
+	
+			<h2 class="font-serif text-[32px] sm:text-[42px] lg:text-[48px] leading-[1.08] mb-8">
+			Some fragrances are worn.<br class="hidden sm:block" />
+			Others become<br class="hidden sm:block" />
+			<em class="font-serif">part of who you are.</em>
+			</h2>
+	
+			<p class="text-[15px] sm:text-[16px] text-charcoal leading-[1.9] max-w-[700px]">
+			A beautiful fragrance does more than smell good.
+			It becomes part of the way you enter a room,
+			the way you carry yourself, and the memories
+			people quietly associate with you.
+			</p>
+		</div>
+	
+		<!-- Fragrance Benefits -->
+		<div class="grid grid-cols-1 sm:grid-cols-3 border-t border-line">
+	
+			<div class="py-7 sm:py-8 sm:pr-8 sm:border-r border-line">
+			<p class="text-[11px] tracking-widest2 uppercase text-clay mb-2">
+				Sets the
+			</p>
+			<p class="font-serif text-[20px] sm:text-[22px]">
+				Mood
+			</p>
+			</div>
+	
+			<div class="py-7 sm:py-8 sm:px-8 sm:border-r border-line">
+			<p class="text-[11px] tracking-widest2 uppercase text-clay mb-2">
+				Expresses your
+			</p>
+			<p class="font-serif text-[20px] sm:text-[22px]">
+				Personality
+			</p>
+			</div>
+	
+			<div class="py-7 sm:py-8 sm:pl-8">
+			<p class="text-[11px] tracking-widest2 uppercase text-clay mb-2">
+				Stays in their
+			</p>
+			<p class="font-serif text-[20px] sm:text-[22px]">
+				Memory
+			</p>
+			</div>
+	
+		</div>
+	
+		<!-- Closing Statement -->
+		<div class="mt-12 sm:mt-14 pt-8 border-t border-line">
+			<p class="text-[11px] sm:text-[12px] tracking-widest2 uppercase text-clay">
+			Wear your story.
+			</p>
+			<p class="font-serif italic text-[24px] sm:text-[28px] mt-2">
+			Leave your trace.
+			</p>
+		</div>
+		</div>
 	</section>
   
 	<!-- ================= REVIEWS ================= -->
@@ -763,4 +819,16 @@
 
 <style>
 .capitalize { text-transform: capitalize !important; }
+
+#mainMediaContainer {
+	height: 600px !important;
+	width: 100%;
+}
+
+@media screen and (max-width: 600px) { 
+	#mainMediaContainer {
+	height: 300px !important;
+}
+
+}
 </style>

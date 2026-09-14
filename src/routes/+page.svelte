@@ -59,11 +59,11 @@
   	}
 
 	  const onSubmit = (/** @type {Event} */ e) => {
-		const /** @type {any} */ payload = { email: formData.email };
 		const user = getItemFromLocalStorage('ecommerce-user', true);
-		if (user?.userId) {
-			payload.userId = user.userId;
-		}
+		const /** @type {any} */ payload = { 
+			email: formData.email,
+			...(user?.userId && { userId: user.userId })
+		};
 		(async () => {
 			try {
 				const result = await joinNewsletter(payload);
@@ -155,6 +155,7 @@
 		<!-- First Category Card -->
 		{#if categories[0]}
 		{@const item = categories[0]}
+		{console.log({item})}
 		<a 
 			href="/product/{item.id}" 
 			class="hover-zoom group relative overflow-hidden block 
@@ -163,9 +164,9 @@
 				{categories.length >= 3 ? 'md:col-span-7 h-[440px] sm:h-[560px]' : ''}"
 		>
 			<img 
-			src={item.image ?? "https://images.pexels.com/photos/31141638/pexels-photo-31141638.jpeg?auto=format&fit=crop&w=1400&q=80"} 
-			alt={item.description ?? item.name}
-			class="w-full h-full object-cover" 
+				src={item.image ?? "https://images.pexels.com/photos/31141638/pexels-photo-31141638.jpeg?auto=format&fit=crop&w=1400&q=80"} 
+				alt={item.description ?? item.name}
+				class="w-full h-full object-cover" 
 			/>
 			<div class="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent"></div>
 			<div class="absolute bottom-0 left-0 p-8 sm:p-10 text-paper">
