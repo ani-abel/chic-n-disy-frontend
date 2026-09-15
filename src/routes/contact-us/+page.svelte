@@ -76,7 +76,6 @@
 				...(names.length > 1 && { lastName: names.slice(1).join(' ') }),
 				...(user?.userId && { userId: user.userId })
 			}
-			console.log({payload});
 
 			isSubmitting = true;
 			formSuccess = false;

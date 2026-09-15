@@ -303,7 +303,7 @@
 			  {/if}
 			</div>
   
-			<div id="thumbnailRow" class="flex gap-3 overflow-x-auto no-scrollbar" role="tablist" aria-label="Product media">
+			<div id="thumbnailRow" class="flex gap-1 overflow-x-auto no-scrollbar" role="tablist" aria-label="Product media">
 			  {#each gallery as media, idx}
 				<button
 				  type="button"
