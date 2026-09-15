@@ -155,7 +155,6 @@
 		<!-- First Category Card -->
 		{#if categories[0]}
 		{@const item = categories[0]}
-		{console.log({item})}
 		<a 
 			href="/product/{item.id}" 
 			class="hover-zoom group relative overflow-hidden block 
