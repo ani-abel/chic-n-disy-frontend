@@ -1,13 +1,13 @@
 {
-  "name": "chic-n-disy",
+  "name": "chik-n-disy",
   "author": {
     "name": "Abel Ani"
   },
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "npm": "11.x",
-    "node": "24.x"
+    "node": ">=24",
+    "npm": ">=10"
   },
   "scripts": {
     "dev": "vite dev",
