@@ -1,4 +1,5 @@
-<script>
+<script>	
+	import { AxiosError } from 'axios';
 	import { goto } from '$app/navigation';
 	import Cart from '../../components/v2/Cart.svelte';
 	import Navbar from '../../components/v2/Navbar.svelte';
@@ -7,8 +8,7 @@
 	import SignupModal from '../../components/v2/Sign-up.svelte';
 	import { sendContactMessage } from '../../api-requests/request';
 	import { displayMessage, getItemFromLocalStorage } from '../../utils';
-	import { AxiosError } from 'axios';
-
+	
 	const formData = {
 		subject: null,
 		email: null,
@@ -351,7 +351,7 @@
 				  <span class="flex-1">
 					<span class="block text-[14px] mb-1 underline-grow w-fit">Email</span>
 					<span class="block text-[13px] text-charcoal">Prefer email? Write to us directly, any time.</span>
-					<span class="block text-[13px] text-clay mt-1">hello@chikndisy.com</span>
+					<span class="block text-[13px] text-clay mt-1">chikndisyfragrances@gmail.com</span>
 				  </span>
 				</a>
 			  </li>
