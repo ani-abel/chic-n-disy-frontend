@@ -7,7 +7,7 @@
   "private": true,
   "engines": {
     "node": ">=24",
-    "npm": ">=10"
+    "npm": ">=11"
   },
   "scripts": {
     "dev": "vite dev",
@@ -25,6 +25,7 @@
     "@iconify-json/ri": "^1.0.0",
     "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/adapter-vercel": "^5.10.3",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@svelteness/kit-docs": "^1.1.5",
@@ -46,7 +47,6 @@
     "@zerodevx/svelte-toast": "^0.9.5",
     "axios": "^1.7.2",
     "i": "^0.3.7",
-    "jsbarcode": "^3.11.6",
-    "npm": "^10.8.2"
+    "jsbarcode": "^3.11.6"
   }
 }
