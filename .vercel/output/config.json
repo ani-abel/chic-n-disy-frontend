@@ -1,0 +1,143 @@
+{
+	"version": 3,
+	"routes": [
+		{
+			"src": "/_app/immutable/.+",
+			"headers": {
+				"cache-control": "public, immutable, max-age=31536000"
+			}
+		},
+		{
+			"handle": "filesystem"
+		},
+		{
+			"src": "^/?(?:/__data.json)?$",
+			"dest": "/"
+		},
+		{
+			"src": "^/about/?(?:/__data.json)?$",
+			"dest": "/about"
+		},
+		{
+			"src": "^/auth/?(?:/__data.json)?$",
+			"dest": "/auth"
+		},
+		{
+			"src": "^/auth/admin/?(?:/__data.json)?$",
+			"dest": "/auth/admin"
+		},
+		{
+			"src": "^/auth/admin/order/?(?:/__data.json)?$",
+			"dest": "/auth/admin/order"
+		},
+		{
+			"src": "^/auth/admin/product-category/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product-category"
+		},
+		{
+			"src": "^/auth/admin/product-category/add/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product-category/add"
+		},
+		{
+			"src": "^/auth/admin/product-category/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product-category/[productCategoryId]"
+		},
+		{
+			"src": "^/auth/admin/product/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product"
+		},
+		{
+			"src": "^/auth/admin/product/add/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product/add"
+		},
+		{
+			"src": "^/auth/admin/product/barcode/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product/barcode/[productId]"
+		},
+		{
+			"src": "^/auth/admin/product/qr-code/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product/qr-code/[productId]"
+		},
+		{
+			"src": "^/auth/admin/product/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/admin/product/[productId]"
+		},
+		{
+			"src": "^/auth/admin/user/?(?:/__data.json)?$",
+			"dest": "/auth/admin/user"
+		},
+		{
+			"src": "^/auth/admin/user/add/?(?:/__data.json)?$",
+			"dest": "/auth/admin/user/add"
+		},
+		{
+			"src": "^/auth/admin/user/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/admin/user/[userId]"
+		},
+		{
+			"src": "^/auth/customer/orders/?(?:/__data.json)?$",
+			"dest": "/auth/customer/orders"
+		},
+		{
+			"src": "^/auth/customer/orders/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/customer/orders/[orderId]"
+		},
+		{
+			"src": "^/auth/customer/recently-viewed/?(?:/__data.json)?$",
+			"dest": "/auth/customer/recently-viewed"
+		},
+		{
+			"src": "^/auth/customer/saved-products/?(?:/__data.json)?$",
+			"dest": "/auth/customer/saved-products"
+		},
+		{
+			"src": "^/auth/customer/shipping-address/?(?:/__data.json)?$",
+			"dest": "/auth/customer/shipping-address"
+		},
+		{
+			"src": "^/auth/customer/shipping-address/add-address/?(?:/__data.json)?$",
+			"dest": "/auth/customer/shipping-address/add-address"
+		},
+		{
+			"src": "^/auth/customer/shipping-address/edit-address/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/auth/customer/shipping-address/edit-address/[addressId]"
+		},
+		{
+			"src": "^/auth/customer/update-profile/?(?:/__data.json)?$",
+			"dest": "/auth/customer/update-profile"
+		},
+		{
+			"src": "^/auth/signup/?(?:/__data.json)?$",
+			"dest": "/auth/signup"
+		},
+		{
+			"src": "^/contact-us/?(?:/__data.json)?$",
+			"dest": "/contact-us"
+		},
+		{
+			"src": "^/payment-verification/?(?:/__data.json)?$",
+			"dest": "/payment-verification"
+		},
+		{
+			"src": "^/product-detail/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/product-detail/[slug]"
+		},
+		{
+			"src": "^/product/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/product/[categoryId]"
+		},
+		{
+			"src": "^/search/?(?:/__data.json)?$",
+			"dest": "/search"
+		},
+		{
+			"src": "^/shop/?(?:/__data.json)?$",
+			"dest": "/shop"
+		},
+		{
+			"src": "/.*",
+			"dest": "/![-]/catchall"
+		}
+	],
+	"overrides": {}
+}
