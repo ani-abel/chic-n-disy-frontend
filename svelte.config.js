@@ -7,8 +7,7 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			// ===> Vercel
-			runtime: 'nodejs24.x'
+			runtime: 'nodejs24.x' // ===> Vercel
 		}),
 		// adapter: adapter(), // ===> default sveltekit adapter
 
