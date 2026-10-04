@@ -1,8 +1,0 @@
-
-
-export const index = 28;
-let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/auth/signup/_page.svelte.js')).default;
-export const imports = ["_app/immutable/nodes/28.C8upkBt4.js","_app/immutable/chunks/scheduler.dwJk_Fko.js","_app/immutable/chunks/index.BtwF-C-j.js","_app/immutable/chunks/index.Tc1whCDR.js","_app/immutable/chunks/util.function.BWTl4hsZ.js","_app/immutable/chunks/SvelteToast.svelte_svelte_type_style_lang.i4Frmz3n.js","_app/immutable/chunks/index.LLrCIvt7.js","_app/immutable/chunks/entry.Amt1YG4m.js","_app/immutable/chunks/request.B9hys7nk.js"];
-export const stylesheets = ["_app/immutable/assets/SvelteToast.DbLvtVfH.css"];
-export const fonts = [];
