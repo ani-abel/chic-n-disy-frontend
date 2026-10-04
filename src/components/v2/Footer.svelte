@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="mt-14 pt-6 border-t border-paper/15 text-[12px] text-paper/45">
-        © 2026 Chikndisy. All rights reserved.
+        © 2026 Chikndisy.com. All rights reserved.
       </div>
     </div>
   </footer>
